@@ -81,7 +81,7 @@ class InputPadrao extends StatelessWidget {
                 counterText: '',
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: TextStyle(color: Cores.azul)
+                hintStyle: TextStyle(color: Cores.texto)
               ),
               onFieldSubmitted: pesquisar,
               onChanged: onChanged,

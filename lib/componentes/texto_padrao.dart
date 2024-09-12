@@ -7,13 +7,15 @@ class TextoPadrao extends StatelessWidget {
   bool negrito;
   double tamanho;
   TextAlign textAlign;
+  int maxLinhas;
 
   TextoPadrao({
     required this.texto,
     this.cor = Colors.white,
     this.tamanho = 24,
     this.negrito = false,
-    this.textAlign = TextAlign.start
+    this.textAlign = TextAlign.start,
+    this.maxLinhas = 1
   });
 
   @override
@@ -21,6 +23,7 @@ class TextoPadrao extends StatelessWidget {
     return Text(
       texto,
       textAlign: textAlign,
+      maxLines: maxLinhas,
       style: TextStyle(
         fontFamily: 'Nunito',
         color: cor,

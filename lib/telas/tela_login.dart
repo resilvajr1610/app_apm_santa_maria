@@ -17,7 +17,6 @@ class _TelaLoginState extends State<TelaLogin> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        // padding: EdgeInsets.symmetric(horizontal: 5),
         width: double.infinity,
         height: double.infinity,
         child:Column(
