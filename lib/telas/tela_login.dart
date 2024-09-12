@@ -1,11 +1,9 @@
-import 'package:app_apm_santa_maria/tela_cadastrar_socio.dart';
+import 'package:app_apm_santa_maria/telas/tela_cadastrar_socio.dart';
 import 'package:app_apm_santa_maria/componentes/botao_sublinhado.dart';
-import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
-import 'package:app_apm_santa_maria/tela_emprestimos.dart';
+import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:flutter/material.dart';
-
-import 'componentes/botao_texto_customizado.dart';
-import 'componentes/input_padrao.dart';
+import '../componentes/botao_texto_customizado.dart';
+import '../componentes/input_padrao.dart';
 
 class TelaLogin extends StatefulWidget {
   const TelaLogin({super.key});

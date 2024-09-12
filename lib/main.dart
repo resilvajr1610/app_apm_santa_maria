@@ -1,4 +1,4 @@
-import 'package:app_apm_santa_maria/tela_splash.dart';
+import 'package:app_apm_santa_maria/telas/tela_splash.dart';
 import 'package:flutter/material.dart';
 
 void main() {

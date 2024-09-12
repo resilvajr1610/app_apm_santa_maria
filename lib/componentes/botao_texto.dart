@@ -9,7 +9,7 @@ class BotaoTexto extends StatelessWidget {
   Color corBotao;
   Color corBorda;
   Color corTexto;
-  var onPressed;
+  var funcao;
   Size tamanhoMaximo;
   Size tamanhoMinimo;
   double arredodamento;
@@ -19,7 +19,7 @@ class BotaoTexto extends StatelessWidget {
     required this.corBotao,
     required this.corBorda,
     required this.corTexto,
-    required this.onPressed,
+    required this.funcao,
     this.tamanhoMaximo = const Size(250, 100),
     this.tamanhoMinimo = const Size(250, 70),
     this.negrito = true,
@@ -43,7 +43,7 @@ class BotaoTexto extends StatelessWidget {
         ),
       ),
       child: TextoPadrao(texto: texto,cor: corTexto,negrito: negrito,tamanho: tamanhoTexto,),
-      onPressed: onPressed,
+      onPressed: funcao,
     );
   }
 }

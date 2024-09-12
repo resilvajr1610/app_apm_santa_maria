@@ -1,4 +1,4 @@
-import 'package:app_apm_santa_maria/tela_login.dart';
+import 'package:app_apm_santa_maria/telas/tela_login.dart';
 import 'package:flutter/material.dart';
 
 class TelaSplash extends StatefulWidget {

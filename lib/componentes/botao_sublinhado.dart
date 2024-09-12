@@ -27,9 +27,6 @@ class BotaoSublinhado extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-
-    double largura = MediaQuery.of(context).size.width;
-
     return Padding(
       padding: EdgeInsets.symmetric(vertical: paddingVertical,horizontal: paddingHorizontal),
       child: TextButton(
