@@ -10,6 +10,7 @@ class DropDownPadrao extends StatelessWidget {
   List list;
   double width;
   double widthContainer;
+  String hint;
 
   DropDownPadrao({
     required this.onChanged,
@@ -18,7 +19,8 @@ class DropDownPadrao extends StatelessWidget {
     required this.list,
     required this.width,
     this.fontSize = 15,
-    this.widthContainer = 300
+    this.widthContainer = 300,
+    this.hint = 'Selecione'
   });
 
   @override
@@ -27,7 +29,7 @@ class DropDownPadrao extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        TextoPadrao(texto: title,tamanho: 14,textAlign: TextAlign.end,cor: Cores.azul,negrito: true,),
+        title.isEmpty?Container():TextoPadrao(texto: title,tamanho: 14,textAlign: TextAlign.end,cor: Cores.azul,negrito: true,),
         Container(
           width: width*0.95,
           padding: EdgeInsets.symmetric(horizontal: 5),
@@ -40,7 +42,7 @@ class DropDownPadrao extends StatelessWidget {
             child: DropdownButton(
                 hint: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: TextoPadrao(texto: 'Selecione',tamanho: 15,textAlign: TextAlign.end,cor: Colors.black,),
+                  child: TextoPadrao(texto: hint,tamanho: 15,textAlign: TextAlign.end,cor: Colors.black,),
                 ),
                 value: select,
                 items: list.map((value) => DropdownMenuItem(

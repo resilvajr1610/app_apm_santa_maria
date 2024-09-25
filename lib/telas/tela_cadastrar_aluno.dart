@@ -113,7 +113,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                 ),
               ],
             ),
-            BotaoCamera(),
+            BotaoCamera(funcao:(){},),
             BotaoTexto(
               texto: 'Avançar',
               tamanhoTexto: 14,

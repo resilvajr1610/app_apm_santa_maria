@@ -11,6 +11,9 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.6
+  brasil_fields:
+  get:
+  image_picker:
 
 dev_dependencies:
   flutter_test:
