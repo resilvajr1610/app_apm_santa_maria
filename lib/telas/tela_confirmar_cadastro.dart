@@ -1,8 +1,6 @@
+import 'dart:io';
 import 'package:app_apm_santa_maria/componentes/appbar_padrao.dart';
-import 'package:app_apm_santa_maria/componentes/botao_camera.dart';
 import 'package:app_apm_santa_maria/componentes/botao_texto.dart';
-import 'package:app_apm_santa_maria/componentes/botao_texto_customizado.dart';
-import 'package:app_apm_santa_maria/componentes/dropdown_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/titulo_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
@@ -10,10 +8,14 @@ import 'package:app_apm_santa_maria/telas/tela_termo_adesao.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:flutter/material.dart';
 
-import '../componentes/input_padrao.dart';
-
 class TelaConfirmarCadastro extends StatefulWidget {
-  const TelaConfirmarCadastro({super.key});
+  Map <String,dynamic> dadosSocio;
+  List<Map<String,dynamic>> alunosAdicionados;
+
+  TelaConfirmarCadastro({
+    required this.dadosSocio,
+    required this.alunosAdicionados,
+  });
 
   @override
   State<TelaConfirmarCadastro> createState() => _TelaConfirmarCadastroState();
@@ -40,7 +42,11 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 10),
               alignment: Alignment.centerLeft,
-              child: CircleAvatar(backgroundColor: Cores.input,maxRadius: 30,)
+              child: CircleAvatar(
+                backgroundColor: Cores.input,
+                maxRadius: 30,
+                child: ClipOval(child: Image.file(File(widget.dadosSocio['foto']!.path),width: 100,height: 100,fit: BoxFit.cover,)),
+              )
             ),
             TituloTexto(titulo: 'Nome', texto: 'Nome completo'),
             Row(
@@ -57,33 +63,50 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
             Divider(color: Cores.azul,),
             TextoPadrao(texto: 'Aluno',cor: Cores.azul,tamanho: 14,negrito: true,),
             Container(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                alignment: Alignment.centerLeft,
-                child: CircleAvatar(backgroundColor: Cores.input,maxRadius: 30,)
+              height: widget.alunosAdicionados.length*220,
+              child: ListView.builder(
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: widget.alunosAdicionados.length,
+                itemBuilder: (context,i){
+                  return   Column(
+                    children: [
+                      Container(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          alignment: Alignment.centerLeft,
+                          child: CircleAvatar(
+                            backgroundColor: Cores.input,
+                            maxRadius: 30,
+                            child: ClipOval(child: Image.file(File(widget.alunosAdicionados[i]['foto']!.path),width: 100,height: 100,fit: BoxFit.cover,)),
+                          )
+                      ),
+                      TituloTexto(titulo: 'Nome', texto: widget.alunosAdicionados[i]['nome']),
+                      TituloTexto(titulo: 'Nome de guerra', texto: widget.alunosAdicionados[i]['nomeGuerra']),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TituloTexto(titulo: 'Matrícula', texto: widget.alunosAdicionados[i]['matricula']),
+                          Container(
+                              width: largura*0.4,
+                              child: TituloTexto(titulo: 'Nascimento', texto: widget.alunosAdicionados[i]['nascimento'])
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TituloTexto(titulo: 'Ano/série', texto: widget.alunosAdicionados[i]['serie']),
+                          Container(
+                              width: largura*0.4,
+                              child: TituloTexto(titulo: 'Sexo', texto: widget.alunosAdicionados[i]['sexo'])
+                          ),
+                        ],
+                      ),
+                      TituloTexto(titulo: 'Religião', texto: widget.alunosAdicionados[i]['religiao']),
+                    ],
+                  );
+                }
+              ),
             ),
-            TituloTexto(titulo: 'Nome', texto: 'Nome completo'),
-            TituloTexto(titulo: 'Nome de guerra', texto: 'Nome de guerra'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TituloTexto(titulo: 'Matrícula', texto: '000000'),
-                Container(
-                  width: largura*0.4,
-                  child: TituloTexto(titulo: 'Nascimento', texto: '00/00/0000')
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TituloTexto(titulo: 'Ano/série', texto: '8º A'),
-                Container(
-                  width: largura*0.4,
-                  child: TituloTexto(titulo: 'Sexo', texto: 'Masculino')
-                ),
-              ],
-            ),
-            TituloTexto(titulo: 'Religião', texto: 'Religião'),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: BotaoTexto(
@@ -95,7 +118,8 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
                 corTexto: Colors.white,
                 tamanhoMaximo: Size(double.infinity,50),
                 tamanhoMinimo: Size(double.infinity,50),
-                funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno())),
+                funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
+                    TelaCadastrarAluno(dadosSocio: widget.dadosSocio,alunosAdicionados: widget.alunosAdicionados,))),
               ),
             ),
             BotaoTexto(
@@ -107,7 +131,8 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
               corTexto: Colors.white,
               tamanhoMaximo: Size(double.infinity,50),
               tamanhoMinimo: Size(double.infinity,50),
-              funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaTermoAdesao())),
+              funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
+                  TelaTermoAdesao(alunosAdicionados: widget.alunosAdicionados,dadosSocio: widget.dadosSocio,))),
             )
           ],
         ),

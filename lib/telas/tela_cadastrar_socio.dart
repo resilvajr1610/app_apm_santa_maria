@@ -37,9 +37,9 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
   var confirmarSenha = TextEditingController();
   XFile? foto;
   String? estadoSelecionado;
+  Map <String,dynamic> dadosSocio = {};
 
   pegarFoto()async{
-    print('aqi');
     try {
       var result = await await ImagePicker().pickImage(source: ImageSource.gallery,imageQuality: 70);
       setState(() {
@@ -64,9 +64,25 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                         if(senha.text == confirmarSenha.text){
                           if(senha.text.length>=5){
                             if(foto!=null){
+                              dadosSocio={
+                                'nome': nome.text,
+                                'cpf' : cpf.text,
+                                'contato': telefone.text,
+                                'rua'  : rua.text,
+                                'numeroCasa' : numero.text,
+                                'complemento' : complemento.text,
+                                'bairro': bairro.text,
+                                'cep' : cep.text,
+                                'cidade' : cidade.text,
+                                'estado' : estadoSelecionado,
+                                'email' : email.text,
+                                'senha' : senha.text,
+                                'foto' : foto
+                              };
                               print('ok');
                               //apenas avançar os dados para a próxima tela, só salvar quando tiver os dados de pelo menos um aluno
                               //e só será criado o usuario no auth depois que o acesso for aceito pelo sistema
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
                             }else{
                               showSnackBar(context, 'Escolha uma foto de perfil para avançar', Colors.red);
                             }
@@ -218,7 +234,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
             InputPadrao(tituloTopo: 'E-mail', controller: email,paddingHorizontal: 0,paddingVertical: 5,textInputType: TextInputType.emailAddress,),
             InputPadrao(tituloTopo: 'Senha', controller: senha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
             InputPadrao(tituloTopo: 'Confirmar Senha', controller: confirmarSenha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
-            BotaoCamera(funcao: ()=>pegarFoto(),),
+            BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
             BotaoTexto(
               texto: 'Avançar',
               tamanhoTexto: 14,

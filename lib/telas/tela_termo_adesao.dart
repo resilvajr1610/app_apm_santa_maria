@@ -1,20 +1,74 @@
 import 'package:app_apm_santa_maria/componentes/appbar_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_aguardar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import '../componentes/botao_texto.dart';
 import '../uteis/cores.dart';
 
 class TelaTermoAdesao extends StatefulWidget {
-  const TelaTermoAdesao({super.key});
+  Map<String,dynamic> dadosSocio;
+  List<Map<String,dynamic>> alunosAdicionados;
+
+  TelaTermoAdesao({
+    required this.dadosSocio,
+    required this.alunosAdicionados,
+  });
 
   @override
   State<TelaTermoAdesao> createState() => _TelaTermoAdesaoState();
 }
 
 class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
+
+  salvarDados()async{
+    if(widget.dadosSocio['foto'] is! String){
+      Reference storageReference = FirebaseStorage.instance.ref().child('socios/${widget.dadosSocio['nome']}_${DateTime.now().toIso8601String()+ ".jpg"}');
+      Uint8List archive = await widget.dadosSocio['foto'].readAsBytes();
+      UploadTask uploadTask = storageReference.putData(archive);
+
+      uploadTask.then((caminho) {
+        caminho.ref.getDownloadURL().then((link) {
+          String linkfoto = link.toString();
+
+          print('linkfoto');
+          print(linkfoto);
+          widget.dadosSocio['foto'] = linkfoto;
+        });
+      });
+    }
+
+    for(int i=0; widget.alunosAdicionados.length > i; i++){
+      if(widget.alunosAdicionados[i]['foto'] is! String){
+        Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${widget.alunosAdicionados[i]['nome']}_${DateTime.now().toIso8601String()+ ".jpg"}');
+        Uint8List archive = await widget.alunosAdicionados[i]['foto'].readAsBytes();
+        UploadTask uploadTask = storageReference.putData(archive);
+
+        uploadTask.then((caminho) {
+          caminho.ref.getDownloadURL().then((link) {
+            String linkfoto = link.toString();
+
+            print('linkfoto');
+            print(linkfoto);
+            widget.alunosAdicionados[i]['foto'] = linkfoto;
+          });
+        });
+      }
+      if(i+1==widget.alunosAdicionados.length){
+        final docRef = FirebaseFirestore.instance.collection('aprovacao').doc();
+        FirebaseFirestore.instance.collection('aprovacao').doc(docRef.id).set({
+          'id' : docRef.id,
+          'situacao' : 'aguardando',
+          'dadosSocio' : widget.dadosSocio,
+          'alunosAdicionados' : widget.alunosAdicionados
+        }).then((_){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaAguardar()));
+        });
+      }
+    }
+  }
 
   confirmarAceitar()async{
     await showDialog(
@@ -45,7 +99,7 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
                 corTexto: Colors.white,
                 tamanhoMaximo: Size(double.infinity,50),
                 tamanhoMinimo: Size(double.infinity,50),
-                funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaAguardar())),
+                funcao: ()=>salvarDados(),
               ),
             ],
           );

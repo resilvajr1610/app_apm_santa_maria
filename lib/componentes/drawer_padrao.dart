@@ -2,13 +2,16 @@ import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_mensagens.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../telas/tela_login.dart';
 import '../uteis/cores.dart';
 import 'item_menu.dart';
 
 class DrawerPadrao extends StatelessWidget {
-  const DrawerPadrao({super.key});
+  DocumentSnapshot? dadosUser;
+
+  DrawerPadrao({required this.dadosUser});
 
   @override
   Widget build(BuildContext context) {
@@ -16,6 +19,9 @@ class DrawerPadrao extends StatelessWidget {
 
     double largura = MediaQuery.of(context).size.width;
     double altura = MediaQuery.of(context).size.height;
+
+    List nomeCompleto = dadosUser==null?[]:dadosUser!['nome'].toString().split(' ');
+    String nome = nomeCompleto.isNotEmpty?nomeCompleto[0]:'';
 
     return Column(
       children: [
@@ -35,11 +41,12 @@ class DrawerPadrao extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: Cores.input,
                   maxRadius: 33,
+                  backgroundImage:dadosUser==null?null: NetworkImage(dadosUser!['foto']),
                 ),
               ),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 5),
-                child: TextoPadrao(texto: 'Bem-vindo, Roberto',cor: Cores.azul,tamanho: 14,textAlign: TextAlign.center,),
+                child: TextoPadrao(texto: 'Bem-vindo, $nome',cor: Cores.azul,tamanho: 14,textAlign: TextAlign.center,),
               ),
               Divider(color: Cores.azul,indent: 50,endIndent: 50,thickness: 2,),
               ItemMenu(

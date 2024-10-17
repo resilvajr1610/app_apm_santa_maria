@@ -4,6 +4,8 @@ import 'package:app_apm_santa_maria/componentes/item_emprestimo.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/titulo_texto.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TelaEmprestimos extends StatefulWidget {
@@ -17,6 +19,21 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
 
   bool abertos = true;
   bool devolvidos = true;
+
+  DocumentSnapshot? dadosUser;
+  
+  carregarUsuario()async{
+    FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
+      dadosUser = docUser;
+      setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    carregarUsuario();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +50,7 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
           SizedBox(width: 10,)
         ],
       ),
-      drawer: DrawerPadrao(),
+      drawer: DrawerPadrao(dadosUser: dadosUser,),
       body: Padding(
         padding: EdgeInsets.all(24),
         child: Column(

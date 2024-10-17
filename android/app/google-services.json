@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "686224316610",
+    "project_id": "apm-santa-maria",
+    "storage_bucket": "apm-santa-maria.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686224316610:android:1e760eb3dd0e4ca5bc835b",
+        "android_client_info": {
+          "package_name": "com.example.app_apm_santa_maria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfIXqegPP96I59uwhsNhuyk9ASdqOW724"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

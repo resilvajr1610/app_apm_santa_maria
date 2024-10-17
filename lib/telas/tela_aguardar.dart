@@ -28,7 +28,7 @@ class _TelaAguardarState extends State<TelaAguardar> {
               alignment: Alignment.center,
               child: TextoPadrao(
                 texto: 'Cadastro realizado com sucesso!\n'
-                       'Aguarde a validação que será enviada no seu e-mail e WhatsApp',tamanho: 20,negrito: true,textAlign: TextAlign.center,),
+                       'Aguarde a validação que será enviada no seu WhatsApp',tamanho: 20,negrito: true,textAlign: TextAlign.center,maxLinhas: 6,),
             ),
           ),
         ],

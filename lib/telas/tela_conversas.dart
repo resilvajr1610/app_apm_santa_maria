@@ -33,7 +33,7 @@ class _TelaConversasState extends State<TelaConversas> {
           SizedBox(width: 10),
         ],
       ),
-      drawer: DrawerPadrao(),
+      drawer: DrawerPadrao(dadosUser: null,),
       body: Container(
         height: altura*0.9,
         padding: EdgeInsets.all(24),

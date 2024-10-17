@@ -28,7 +28,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
           SizedBox(width: 10,)
         ],
       ),
-      drawer: DrawerPadrao(),
+      drawer: DrawerPadrao(dadosUser: null,),
       body: Padding(
         padding: EdgeInsets.all(24),
         child: Column(
