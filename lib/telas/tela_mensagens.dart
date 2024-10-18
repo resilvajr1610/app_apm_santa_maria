@@ -1,4 +1,6 @@
 import 'package:app_apm_santa_maria/componentes/item_mensagem.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../componentes/drawer_padrao.dart';
@@ -12,6 +14,21 @@ class TelaMensagens extends StatefulWidget {
 }
 
 class _TelaMensagensState extends State<TelaMensagens> {
+
+  DocumentSnapshot? dadosUser;
+
+  carregarUsuario()async{
+    FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
+      dadosUser = docUser;
+      setState(() {});
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    carregarUsuario();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -28,7 +45,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
           SizedBox(width: 10,)
         ],
       ),
-      drawer: DrawerPadrao(dadosUser: null,),
+      drawer: DrawerPadrao(dadosUser: dadosUser,),
       body: Padding(
         padding: EdgeInsets.all(24),
         child: Column(
