@@ -23,7 +23,7 @@ class ItemEmprestimo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: devolvido?Cores.cinzaClaro:Cores.cinzaEscuro,
+          color: !devolvido?Cores.cinzaClaro:Cores.cinzaEscuro,
           borderRadius: BorderRadius.all(Radius.circular(10))
       ),
       margin: EdgeInsets.symmetric(vertical: 5),
@@ -35,12 +35,18 @@ class ItemEmprestimo extends StatelessWidget {
             children: [
               TextoPadrao(texto: dataEmprestado,cor: Colors.black87,tamanho: 12,),
               Spacer(),
-              TextoPadrao(texto: devolvido?'Devolução: ':'Devolvido: ',cor: devolvido?Colors.red:Cores.azul,tamanho: 12,),
+              TextoPadrao(texto: !devolvido?'Devolução: ':'Devolvido: ',cor: !devolvido?Colors.red:Cores.azul,tamanho: 12,),
               TextoPadrao(texto: dataDevolucao,cor: Colors.black87,tamanho: 12,),
             ],
           ),
           TituloTexto(titulo: 'Material', texto: material),
-          TituloTexto(titulo: 'Aluno', texto: aluno),
+          Row(
+            children: [
+              TituloTexto(titulo: 'Aluno', texto: aluno),
+              devolvido?Spacer():Container(),
+              devolvido?Icon(Icons.check_circle,color: Colors.grey,):Container()
+            ],
+          ),
         ],
       ),
     );

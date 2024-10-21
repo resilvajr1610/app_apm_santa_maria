@@ -2,11 +2,11 @@ import 'package:app_apm_santa_maria/componentes/check_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/drawer_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/item_emprestimo.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
-import 'package:app_apm_santa_maria/componentes/titulo_texto.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TelaEmprestimos extends StatefulWidget {
   const TelaEmprestimos({super.key});
@@ -21,6 +21,7 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
   bool devolvidos = true;
 
   DocumentSnapshot? dadosUser;
+  List<ItemEmprestimo> emprestimos=[];
   
   carregarUsuario()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
@@ -29,10 +30,34 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
     });
   }
 
+  carregarEmprestimos()async{
+    FirebaseFirestore.instance.collection('emprestimos').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).get().then((docEmp){
+      for(int i=0; docEmp.docs.length > i; i++){
+        emprestimos.add(
+            ItemEmprestimo(
+                devolvido: docEmp.docs[i]['situacao']=='concluido',
+                material: docEmp.docs[i]['material'],
+                aluno: docEmp.docs[i]['nomeAluno'].toString().toUpperCase(),
+                dataEmprestado: docEmp.docs[i]['dataEmprestimo'],
+                dataDevolucao: docEmp.docs[i]['situacao']=='concluido'?formatarData(docEmp.docs[i]['dataConcluido']):docEmp.docs[i]['dataDevolucao']
+            )
+        );
+      }
+      setState(() {});
+    });
+  }
+
+  String formatarData(Timestamp timestamp) {
+    DateTime data = timestamp.toDate();
+    String dataFormatada = DateFormat('dd/MM/yyyy').format(data);
+    return dataFormatada;
+  }
+
   @override
   void initState() {
     super.initState();
     carregarUsuario();
+    carregarEmprestimos();
   }
 
   @override
@@ -83,16 +108,10 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
             Container(
               height: altura*0.75,
               child: ListView.builder(
-                itemCount: 10,
+                itemCount: emprestimos.length,
                 itemBuilder: (context,i){
-                  return !devolvidos&&!abertos?Container():devolvidos&&!abertos&&i!=0?Container():!devolvidos&&abertos&&i==0?Container():
-                  ItemEmprestimo(
-                    devolvido: i==0,
-                    material: 'Calça de sarja bege P',
-                    aluno: 'Gustavo Oliveira',
-                    dataEmprestado: '20/06/2024',
-                    dataDevolucao: '20/07/2024'
-                  );
+                  return devolvidos && !abertos && emprestimos[i].devolvido?
+                  emprestimos[i]:!devolvidos && abertos && !emprestimos[i].devolvido?emprestimos[i]:devolvidos && abertos?emprestimos[i]:Container();
                 },
               ),
             )

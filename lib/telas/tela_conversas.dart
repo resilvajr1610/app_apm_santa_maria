@@ -1,13 +1,15 @@
+import 'package:app_apm_santa_maria/componentes/item_mensagem.dart';
+import 'package:app_apm_santa_maria/componentes/item_conversa.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_string.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../componentes/botao_texto.dart';
+import 'package:intl/intl.dart';
 import '../componentes/drawer_padrao.dart';
-import '../componentes/input_padrao.dart';
 import '../componentes/texto_padrao.dart';
 import '../uteis/cores.dart';
-import '../componentes/item_conversa.dart';
 
 class TelaConversas extends StatefulWidget {
-  const TelaConversas({super.key});
 
   @override
   State<TelaConversas> createState() => _TelaConversasState();
@@ -15,96 +17,83 @@ class TelaConversas extends StatefulWidget {
 
 class _TelaConversasState extends State<TelaConversas> {
 
+  DocumentSnapshot? dadosUser;
+
+  List<ItemConversa> conversas = [];
+
+  carregarUsuario()async{
+    FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
+      dadosUser = docUser;
+      setState(() {});
+    });
+  }
+
+  carregarConversas()async{
+    FirebaseFirestore.instance.collection('conversas').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).get().then((docConversas){
+      for(int i =0; docConversas.docs.length > i; i++){
+        conversas.add(
+            ItemConversa(
+                mensagem: docConversas.docs[i]['mensagem'],
+                data: formatarDataHora(docConversas.docs[i]['envio']),
+                visto: docConversas.docs[i]['vistoSocio']!='nao',
+                cargo: docConversas.docs[i]['perfilFunc'],
+                de: docConversas.docs[i]['nomeFunc'],
+                idConversa: docConversas.docs[i].id,
+            )
+        );
+      }
+      setState(() {});
+    });
+  }
+
+  String formatarDataHora(Timestamp timestamp) {
+    DateTime data = timestamp.toDate();
+    String dataFormatada = DateFormat('dd/MM/yyyy HH:mm').format(data);
+    return dataFormatada;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    carregarUsuario();
+    carregarConversas();
+  }
   @override
   Widget build(BuildContext context) {
+
+    double largura = MediaQuery.of(context).size.width;
     double altura = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Container(
-          alignment: Alignment.centerRight,
-          child: TextoPadrao(texto: 'APM', negrito: true, tamanho: 20),
-        ),
+        title: Container(alignment:Alignment.centerRight,child: TextoPadrao(texto: 'APM',negrito: true,tamanho: 20,)),
         backgroundColor: Cores.azul,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          Image.asset('assets/imagens/logo.png', height: 50),
-          SizedBox(width: 10),
+          Image.asset('assets/imagens/logo.png',height: 50,),
+          SizedBox(width: 10,)
         ],
       ),
-      drawer: DrawerPadrao(dadosUser: null,),
-      body: Container(
-        height: altura*0.9,
+      drawer: DrawerPadrao(dadosUser: dadosUser,),
+      body: Padding(
         padding: EdgeInsets.all(24),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextoPadrao(
-              texto: 'Mensagens',
-              cor: Cores.azul,
-              tamanho: 14,
-              negrito: true,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: TextoPadrao(
-                texto: 'Gustavo - Administração',
-                cor: Cores.azul,
-                tamanho: 12,
-                negrito: true,
-              ),
-            ),
-            Container(
-              height: altura * 0.7,
+            TextoPadrao(texto: 'Mensagens',cor: Cores.azul,tamanho: 14,negrito: true,),
+            conversas.isEmpty?Container(
+              alignment: Alignment.center,
+              height: altura*0.8,
+              child: TextoPadrao(texto: 'Não há mensagens',cor: Cores.texto,tamanho: 18,),):Container(
+              margin: EdgeInsets.only(top: 24),
+              height: altura*0.75,
               child: ListView.builder(
-                reverse: true,
-                itemCount: 10,
-                itemBuilder: (context, i) {
-                  return Container(
-                    child: ItemConversa(
-                      mensagem:
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit...',
-                      data: '20/06/2024',
-                      destinatario: i > 1,
-                    ),
-                  );
+                itemCount: conversas.length,
+                itemBuilder: (context,i){
+                  return conversas[i];
                 },
               ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                color: Cores.input,
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: InputPadrao(
-                      arredondamentoDireito: 0,
-                      arredondamentoEsquerdo: 10,
-                      tituloTopo: '',
-                      controller: TextEditingController(),
-                      corBorda: Cores.input,
-                      paddingHorizontal: 0,
-                      paddingVertical: 0,
-                      hint: 'Digite a sua mensagem',
-                    ),
-                  ),
-                  BotaoTexto(
-                    tamanhoMaximo: Size(100, 35),
-                    tamanhoMinimo: Size(100, 35),
-                    arredodamento: 5,
-                    texto: 'Enviar',
-                    corBotao: Cores.azul,
-                    corBorda: Cores.azul,
-                    corTexto: Colors.white,
-                    negrito: false,
-                    tamanhoTexto: 14,
-                    funcao: () {},
-                  )
-                ],
-              ),
-            ),
+            )
           ],
         ),
       ),
