@@ -2,6 +2,7 @@ import 'package:app_apm_santa_maria/componentes/appbar_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_aguardar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,12 +58,14 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
         });
       }
       if(i+1==widget.alunosAdicionados.length){
+        String? token = await FirebaseMessaging.instance.getToken();
         final docRef = FirebaseFirestore.instance.collection('aprovacao').doc();
         FirebaseFirestore.instance.collection('aprovacao').doc(docRef.id).set({
           'id' : docRef.id,
           'situacao' : 'aguardando',
           'dadosSocio' : widget.dadosSocio,
-          'alunosAdicionados' : widget.alunosAdicionados
+          'alunosAdicionados' : widget.alunosAdicionados,
+          'token' : token
         }).then((_){
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaAguardar()));
         });
@@ -160,11 +163,11 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
             margin: EdgeInsets.all(24),
             padding: EdgeInsets.all(17),
             child: TextoPadrao(
+              maxLinhas: 50,
               tamanho: 14,
               cor: Colors.black87,
               texto:
-              '''       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.''',
+              '''       Aceito e acato as disposições contidas no Estatuto da Associação de Pais e Mestres (APM), do Colégio Militar de Santa Maria (CMSM), manifestando expressamente meu interesse no sentido de fazer parte do Quadro Social da APM/CMSM, na categoria de Associado Contribuinte, a qual será estabelecida após assinatura do presente Termo de Adesão e aceite por parte desta entidade.''',
             ),
           ),
           Padding(

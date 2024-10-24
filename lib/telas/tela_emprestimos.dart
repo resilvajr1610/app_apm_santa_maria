@@ -2,9 +2,11 @@ import 'package:app_apm_santa_maria/componentes/check_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/drawer_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/item_emprestimo.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/sevicos/servico_notificacao.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -22,7 +24,17 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
 
   DocumentSnapshot? dadosUser;
   List<ItemEmprestimo> emprestimos=[];
-  
+
+  ServicoNotificacao servicoNotificacao = ServicoNotificacao();
+
+  pegarToken()async{
+    String? token = await FirebaseMessaging.instance.getToken();
+    print("Token do dispositivo: $token");
+    FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({
+      'token' : token
+    });
+  }
+
   carregarUsuario()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
@@ -56,6 +68,10 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
   @override
   void initState() {
     super.initState();
+    servicoNotificacao.permissaoNotificacao(context);
+    servicoNotificacao.firebaseInit(context);
+    servicoNotificacao.setupInterMessage(context);
+    pegarToken();
     carregarUsuario();
     carregarEmprestimos();
   }

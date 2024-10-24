@@ -48,7 +48,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     List nomeCompleto = nomeAluno.text.split(' ');
     if(nomeCompleto.length>1){
       if(nomeGuerra.text.isNotEmpty){
-        if(matricula.text.isNotEmpty){
+        if(matricula.text.length>3){
           if(nascimento.text.length==10){
             if(anoSelecionado!=null){
               if(sexoSelecionado!=null){
@@ -96,7 +96,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
             showSnackBar(context, 'Data de nascimento está incompleto', Colors.red);
           }
         }else{
-          showSnackBar(context, 'Matrácula não está preenchida', Colors.red);
+          showSnackBar(context, 'Matrícula incorreta', Colors.red);
         }
       }else{
         showSnackBar(context, 'Nome de guerra não preenchido', Colors.red);

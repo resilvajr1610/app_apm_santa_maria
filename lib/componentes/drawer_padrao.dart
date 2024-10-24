@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_conversas.dart';
+import 'package:app_apm_santa_maria/telas/tela_estatuto_pdf.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,7 @@ class DrawerPadrao extends StatelessWidget {
               ItemMenu(
                 titulo: 'Estatuto da APM',
                 icone: Icons.book,
-                funcao: () {},
+                funcao: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaEstatutoPDF())),
               ),
               ItemMenu(
                 titulo: 'Empréstimos',

@@ -1,4 +1,5 @@
 import 'package:app_apm_santa_maria/modelos/bad_state_string.dart';
+import 'package:app_apm_santa_maria/sevicos/get_service_key.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -64,6 +65,11 @@ class _TelaMensagensState extends State<TelaMensagens> {
   }
 
   salvarConversaMensagem()async{
+
+    GetServiceKey getServiceKey = GetServiceKey();
+    String acessToken = await getServiceKey.getServerKeyToken();
+    print(acessToken);
+
     FirebaseFirestore.instance.collection('conversas').doc(widget.idConversa).set({
       'mensagem'        : inputMensagem.text,
       'vistoFunc'       : 'nao',

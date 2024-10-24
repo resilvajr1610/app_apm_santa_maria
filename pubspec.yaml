@@ -4,7 +4,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
   flutter:
@@ -18,7 +18,15 @@ dependencies:
   firebase_auth: ^4.1.4
   cloud_firestore: ^4.1.0
   firebase_storage: ^11.0.6
+  firebase_messaging:
+  flutter_local_notifications: ^15.0.0
   intl:
+  flutter_pdfview:
+  path_provider: ^2.0.9
+  googleapis_auth: ^1.6.0
+  http: ^1.2.1
+  app_settings: ^5.0.0
+  firebase_app_installations:
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +40,7 @@ flutter:
 
   assets:
     - assets/imagens/
+    - assets/pdf/estatuto.pdf
 
   fonts:
     - family: Nunito
