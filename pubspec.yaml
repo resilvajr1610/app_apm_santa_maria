@@ -27,6 +27,8 @@ dependencies:
   http: ^1.2.1
   app_settings: ^5.0.0
   firebase_app_installations:
+  url_launcher: ^6.1.7
+  font_awesome_flutter: ^10.4.0
 
 dev_dependencies:
   flutter_test:

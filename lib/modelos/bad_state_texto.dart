@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-String BadStateString(item, type) {
+String BadStateTexto(item, type) {
   String text = '';
   try {
     if (item != null) {

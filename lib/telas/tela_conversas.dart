@@ -1,6 +1,7 @@
 import 'package:app_apm_santa_maria/componentes/item_mensagem.dart';
 import 'package:app_apm_santa_maria/componentes/item_conversa.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_string.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _TelaConversasState extends State<TelaConversas> {
   }
 
   carregarConversas()async{
-    FirebaseFirestore.instance.collection('conversas').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).get().then((docConversas){
+    FirebaseFirestore.instance.collection('conversas').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).snapshots().listen((docConversas){
       for(int i =0; docConversas.docs.length > i; i++){
         conversas.add(
             ItemConversa(
@@ -39,6 +40,23 @@ class _TelaConversasState extends State<TelaConversas> {
                 cargo: docConversas.docs[i]['perfilFunc'],
                 de: docConversas.docs[i]['nomeFunc'],
                 idConversa: docConversas.docs[i].id,
+                tipo: BadStateTexto(docConversas.docs[i],'topicos')!=''?'transmissao':'privado',
+            )
+        );
+      }
+      setState(() {});
+    });
+    FirebaseFirestore.instance.collection('conversas').where('topicos',isEqualTo: 'socio').snapshots().listen((docConversas){
+      for(int i =0; docConversas.docs.length > i; i++){
+        conversas.add(
+            ItemConversa(
+              mensagem: docConversas.docs[i]['mensagem'],
+              data: formatarDataHora(docConversas.docs[i]['envio']),
+              visto: BadStateLista(docConversas.docs[i],'vistos').contains(FirebaseAuth.instance.currentUser!.uid),
+              cargo: docConversas.docs[i]['perfilFunc'],
+              de: docConversas.docs[i]['nomeFunc'],
+              idConversa: docConversas.docs[i].id,
+              tipo: BadStateTexto(docConversas.docs[i],'topicos')!=''?'transmissao':'privado',
             )
         );
       }

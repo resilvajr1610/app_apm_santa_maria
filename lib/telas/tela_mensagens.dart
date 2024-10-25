@@ -1,8 +1,7 @@
-import 'package:app_apm_santa_maria/modelos/bad_state_string.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/sevicos/get_service_key.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../componentes/botao_texto.dart';
@@ -14,9 +13,11 @@ import '../componentes/item_mensagem.dart';
 
 class TelaMensagens extends StatefulWidget {
   String idConversa;
+  String tipo;
 
   TelaMensagens({
     required this.idConversa,
+    required this.tipo,
 });
 
   @override
@@ -46,7 +47,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
             enviado: doc['enviado'],
             idFunc: doc['idFunc'],
             nomeFunc: doc['nomeFunc'],
-            perfilFunc: BadStateString(doc, 'perfilFunc'),
+            perfilFunc: BadStateTexto(doc, 'perfilFunc'),
             nomeSocio: doc['nomeSocio'],
             alunos: doc['alunos'],
           ),
@@ -109,10 +110,16 @@ class _TelaMensagensState extends State<TelaMensagens> {
   }
 
   atualizarVisto()async{
-    FirebaseFirestore.instance.collection('conversas').doc(widget.idConversa).update({
-          'vistoSocio':'sim',
-          'vistoSocioData' : DateTime.now()
-    });
+    if(widget.tipo=='privado'){
+      FirebaseFirestore.instance.collection('conversas').doc(widget.idConversa).update({
+        'vistoSocio':'sim',
+        'vistoSocioData' : DateTime.now()
+      });
+    }else{
+      FirebaseFirestore.instance.collection('conversas').doc(widget.idConversa).update({
+        'vistos':FieldValue.arrayUnion([FirebaseAuth.instance.currentUser!.uid]),
+      });
+    }
   }
   
   @override
@@ -155,7 +162,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
             mensagens.isEmpty?Container():Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
               child: TextoPadrao(
-                texto: '${mensagens[0].nomeFunc}',
+                texto: '${mensagens[0].nomeFunc} ${widget.tipo!='privado'?'- TRANSMISSÃO':''}',
                 cor: Cores.azul,
                 tamanho: 12,
                 negrito: true,
@@ -171,7 +178,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
                 },
               ),
             ),
-            Container(
+            widget.tipo!='privado'?Container():Container(
               decoration: BoxDecoration(
                 color: Cores.input,
                 borderRadius: BorderRadius.all(Radius.circular(5)),

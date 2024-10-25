@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/telas/tela_empresas.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_conversas.dart';
 import 'package:app_apm_santa_maria/telas/tela_estatuto_pdf.dart';
@@ -84,6 +85,14 @@ class DrawerPadrao extends StatelessWidget {
                 funcao: () => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => TelaEmprestimos()),
+                ),
+              ),
+              ItemMenu(
+                titulo: 'Empresas',
+                icone: Icons.business,
+                funcao: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TelaEmpresas(dadosUser: dadosUser,)),
                 ),
               ),
               Row(

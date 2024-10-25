@@ -39,11 +39,13 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
       setState(() {});
+      salvarTopicos(docUser);
     });
   }
 
   carregarEmprestimos()async{
-    FirebaseFirestore.instance.collection('emprestimos').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).get().then((docEmp){
+    FirebaseFirestore.instance.collection('emprestimos').where('idSocio',isEqualTo: FirebaseAuth.instance.currentUser!.uid).snapshots().listen((docEmp){
+      emprestimos.clear();
       for(int i=0; docEmp.docs.length > i; i++){
         emprestimos.add(
             ItemEmprestimo(
@@ -65,6 +67,31 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
     return dataFormatada;
   }
 
+  salvarTopicos(var user)async{
+    FirebaseMessaging.instance.subscribeToTopic('socio').then((_){
+      FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+        'topicos': FieldValue.arrayUnion(['socio'])
+      });
+    });
+    for(int i=0; user['alunos'].length>i; i++){
+      FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
+        FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
+          FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
+            FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+              'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+            });
+          });
+        });
+      });
+    }
+  }
+
+  salvarAcesso(){
+    FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({
+      'ultimoAcesso':DateTime.now()
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +101,7 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
     pegarToken();
     carregarUsuario();
     carregarEmprestimos();
+    salvarAcesso();
   }
 
   @override

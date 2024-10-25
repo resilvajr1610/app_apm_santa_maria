@@ -15,6 +15,7 @@ class InputPadrao extends StatelessWidget {
   Color corInput;
   Color corBorda;
   Color corTitulo;
+  Color corHint;
   var onChanged;
   String textoValidacao;
   bool habilitado;
@@ -36,6 +37,7 @@ class InputPadrao extends StatelessWidget {
     this.corBorda = Colors.white,
     this.corInput = Cores.input,
     this.corTitulo = Cores.azul,
+    this.corHint = Cores.texto,
     this.onChanged = null,
     this.textoValidacao = '',
     this.habilitado = true,
@@ -81,7 +83,7 @@ class InputPadrao extends StatelessWidget {
                 counterText: '',
                 border: InputBorder.none,
                 hintText: hint,
-                hintStyle: TextStyle(color: Cores.texto)
+                hintStyle: TextStyle(color: corHint)
               ),
               onFieldSubmitted: pesquisar,
               onChanged: onChanged,
