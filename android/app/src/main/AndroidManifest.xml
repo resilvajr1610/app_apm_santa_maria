@@ -6,7 +6,7 @@
 
 
     <application
-        android:label="app_apm_santa_maria"
+        android:label="APM Santa Maria"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
