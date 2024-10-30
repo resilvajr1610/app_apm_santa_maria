@@ -26,7 +26,7 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
 
   salvarDados()async{
     if(widget.dadosSocio['foto'] is! String){
-      Reference storageReference = FirebaseStorage.instance.ref().child('socios/${widget.dadosSocio['nome']}_${DateTime.now().toIso8601String()+ ".jpg"}');
+      Reference storageReference = FirebaseStorage.instance.ref().child('socios/${widget.dadosSocio['cpf'].toString().replaceAll('.', '').replaceAll('-', '')}_${DateTime.now().toIso8601String()+ ".jpg"}');
       Uint8List archive = await widget.dadosSocio['foto'].readAsBytes();
       UploadTask uploadTask = storageReference.putData(archive);
 
@@ -43,7 +43,7 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
 
     for(int i=0; widget.alunosAdicionados.length > i; i++){
       if(widget.alunosAdicionados[i]['foto'] is! String){
-        Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${widget.alunosAdicionados[i]['nome']}_${DateTime.now().toIso8601String()+ ".jpg"}');
+        Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${DateTime.now().toIso8601String()+ ".jpg"}');
         Uint8List archive = await widget.alunosAdicionados[i]['foto'].readAsBytes();
         UploadTask uploadTask = storageReference.putData(archive);
 

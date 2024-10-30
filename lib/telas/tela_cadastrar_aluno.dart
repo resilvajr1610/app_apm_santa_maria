@@ -8,7 +8,9 @@ import 'package:app_apm_santa_maria/componentes/snackBars.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/modelos/serie_modelo.dart';
 import 'package:app_apm_santa_maria/telas/tela_confirmar_cadastro.dart';
+import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:brasil_fields/brasil_fields.dart';
@@ -17,8 +19,8 @@ import '../componentes/input_padrao.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TelaCadastrarAluno extends StatefulWidget {
-  Map <String, dynamic> dadosSocio;
-  List<Map<String,dynamic>> alunosAdicionados;
+  Map <String, dynamic>? dadosSocio;
+  var alunosAdicionados;
 
   TelaCadastrarAluno({
     required this.dadosSocio,
@@ -43,6 +45,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
   XFile? foto;
   Map <String,dynamic> dadosAlunoAtual = {};
   List<Map<String,dynamic>> alunosAdicionados = [];
+  String fotoLink = '';
 
   verificarAluno(){
     List nomeCompleto = nomeAluno.text.split(' ');
@@ -79,7 +82,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
 
                     print('ok');
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                        TelaConfirmarCadastro(dadosSocio: widget.dadosSocio,alunosAdicionados: alunosAdicionados,)));
+                        TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
                   }else{
                     showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
                   }
@@ -106,6 +109,81 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     }
   }
 
+  verificarAlteracao(){
+    List nomeCompleto = nomeAluno.text.split(' ');
+    if(nomeCompleto.length>1){
+      if(nomeGuerra.text.isNotEmpty){
+        if(matricula.text.length>3){
+          if(nascimento.text.length==10){
+            if(anoSelecionado!=null){
+              if(sexoSelecionado!=null){
+                if(religiaoSelecionado!=null){
+                  if(foto!=null || fotoLink!=''){
+                    print('ok');
+                    salvarDados();
+                  }else{
+                    showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
+                  }
+                }else{
+                  showSnackBar(context, 'Selecione a religião do aluno', Colors.red);
+                }
+              }else{
+                showSnackBar(context, 'Selecione o sexo do aluno', Colors.red);
+              }
+            }else{
+              showSnackBar(context, 'Selecione o ano série do aluno', Colors.red);
+            }
+          }else{
+            showSnackBar(context, 'Data de nascimento está incompleto', Colors.red);
+          }
+        }else{
+          showSnackBar(context, 'Matrícula incorreta', Colors.red);
+        }
+      }else{
+        showSnackBar(context, 'Nome de guerra não preenchido', Colors.red);
+      }
+    }else{
+      showSnackBar(context, 'Nome está incompleto', Colors.red);
+    }
+  }
+
+  salvarDados()async{
+
+    dadosAlunoAtual = {};
+    dadosAlunoAtual={
+      'nome': nomeAluno.text.toUpperCase(),
+      'nomeGuerra' : nomeGuerra.text.toUpperCase(),
+      'matricula': matricula.text.toUpperCase(),
+      'nascimento'  : nascimento.text.toUpperCase(),
+      'serie' : anoSelecionado!.nome,
+      'idSerie' : anoSelecionado!.id,
+      'sexo': sexoSelecionado,
+      'religiao' : religiaoSelecionado,
+    };
+    if(foto!=null){
+      Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${DateTime.now().toIso8601String()+ ".jpg"}');
+      Uint8List archive = await foto!.readAsBytes();
+      UploadTask uploadTask = storageReference.putData(archive);
+
+      uploadTask.then((caminho) {
+        caminho.ref.getDownloadURL().then((link) {
+          String linkfoto = link.toString();
+
+          print('linkfoto');
+          print(linkfoto);
+          dadosAlunoAtual['foto'] = linkfoto;
+          FirebaseFirestore.instance.collection('alunos').doc(widget.alunosAdicionados[0]['idAluno']).set(dadosAlunoAtual,SetOptions(merge: true)).then((_){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+          });
+        });
+      });
+    }else{
+      FirebaseFirestore.instance.collection('alunos').doc(widget.alunosAdicionados[0]['idAluno']).set(dadosAlunoAtual,SetOptions(merge: true)).then((_){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+      });
+    }
+  }
+
   carregarSeries(){
     FirebaseFirestore.instance.collection('series').orderBy('nome').get().then((seriesDoc){
       series.clear();
@@ -116,6 +194,9 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                 nome: seriesDoc.docs[i]['nome']??'',
             )
         );
+      }
+      if(widget.dadosSocio==null){
+        dadosAluno();
       }
       setState(() {});
     });
@@ -135,10 +216,24 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     alunosAdicionados = widget.alunosAdicionados;
   }
 
+  dadosAluno(){
+    nomeAluno.text = widget.alunosAdicionados[0]['nome'];
+    nomeGuerra.text = widget.alunosAdicionados[0]['nomeGuerra'];
+    matricula.text = widget.alunosAdicionados[0]['matricula'];
+    nascimento.text = widget.alunosAdicionados[0]['nascimento'];
+    anoSelecionado = series.firstWhere((serie) => serie.id == widget.alunosAdicionados[0]['idSerie']);
+    sexoSelecionado = widget.alunosAdicionados[0]['sexo'];
+    religiaoSelecionado = widget.alunosAdicionados[0]['religiao'];
+    fotoLink = widget.alunosAdicionados[0]['foto'];
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-    carregarAlunos();
+    if(widget.dadosSocio!=null){
+      carregarAlunos();
+    }
     carregarSeries();
   }
 
@@ -242,16 +337,26 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                 ),
               ],
             ),
-            BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
+            widget.dadosSocio==null && foto ==null?Container(
+              padding: EdgeInsets.all(10),
+              child: GestureDetector(
+                onTap: ()=>pegarFoto(),
+                child: fotoLink==''?Container(): CircleAvatar(
+                  backgroundColor: Cores.input,
+                  maxRadius: 50,
+                  backgroundImage: NetworkImage(fotoLink),
+                ),
+              ),
+            ):BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
             BotaoTexto(
-              texto: 'Avançar',
+              texto: widget.dadosSocio==null?'Salvar':'Avançar',
               tamanhoTexto: 14,
               corBorda: Cores.azul,
               corBotao: Cores.azul,
               corTexto: Colors.white,
               tamanhoMaximo: Size(double.infinity,50),
               tamanhoMinimo: Size(double.infinity,50),
-              funcao: ()=>verificarAluno(),
+              funcao: ()=>widget.dadosSocio==null?verificarAlteracao():verificarAluno(),
             )
           ],
         ),

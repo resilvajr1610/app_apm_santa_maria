@@ -264,54 +264,71 @@ class _TelaEmpresasState extends State<TelaEmpresas> {
                           itemCount: listaEmpresasFiltradas.length,
                           itemBuilder: (context,i){
 
-                            return GestureDetector(
-                              onTap: (){
-                              },
-                              child: Container(
-                                height: 60,
-                                decoration: BoxDecoration(
-                                    // color: Cores.tabela,
-                                    borderRadius: BorderRadius.all(Radius.circular(10))
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                        width: 90,
-                                        margin: EdgeInsets.only(left: 5),
-                                        child: TextoPadrao(texto: listaEmpresasFiltradas[i].nome ,tamanho: 10,cor: Colors.black87,)
-                                    ),
-                                    Container(
-                                        width: 80,
-                                        margin: EdgeInsets.symmetric(vertical: 10,horizontal: 0),
-                                        child: TextoPadrao(texto: listaEmpresasFiltradas[i].ramo.nome ,tamanho: 10,cor: Colors.black87,)
-                                    ),
-                                    Container(
-                                        width: 90,
-                                        margin: EdgeInsets.symmetric(vertical: 10,horizontal: 0),
-                                        child: TextoPadrao(texto: listaEmpresasFiltradas[i].endereco ,tamanho: 10,cor: Colors.black87,)
-                                    ),
-                                    listaTodasEmpresas[i].instagram.isEmpty?Container():IconButton(
-                                      style: IconButton.styleFrom(backgroundColor: Cores.azul,maximumSize: Size(30, 30),minimumSize:Size(30, 30) ),
+                            return Container(
+                              height: 50,
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                  // color: Cores.tabela,
+                                  borderRadius: BorderRadius.all(Radius.circular(10))
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                      width: 90,
+                                      margin: EdgeInsets.only(left: 5,top: 10),
+                                      child: TextoPadrao(texto: listaEmpresasFiltradas[i].nome ,tamanho: 10,cor: Colors.black87,)
+                                  ),
+                                  Container(
+                                      width: 80,
+                                      margin: EdgeInsets.symmetric(vertical: 10,horizontal: 0),
+                                      child: TextoPadrao(texto: listaEmpresasFiltradas[i].ramo.nome ,tamanho: 10,cor: Colors.black87,)
+                                  ),
+                                  Container(
+                                      width: 90,
+                                      margin: EdgeInsets.symmetric(vertical: 10,horizontal: 0),
+                                      child: TextoPadrao(texto: listaEmpresasFiltradas[i].endereco ,tamanho: 10,cor: Colors.black87,)
+                                  ),
+                                  listaTodasEmpresas[i].instagram.isEmpty?Container():Container(
+                                    width: 30,
+                                    child: IconButton(
+                                      style: IconButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                          backgroundColor: Cores.azul,maximumSize: Size(30, 30),minimumSize:Size(30, 30) ),
                                       icon: Icon(FontAwesomeIcons.instagram,color: Colors.white,size: 15,),
                                       onPressed: ()=>launchURL(listaTodasEmpresas[i].instagram),
                                     ),
-                                    listaTodasEmpresas[i].facebook.isEmpty?Container():IconButton(
+                                  ),
+                                  listaTodasEmpresas[i].facebook.isEmpty?Container():Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 2.5),
+                                    width: 30,
+                                    child: IconButton(
                                       style: IconButton.styleFrom(backgroundColor: Cores.azul,maximumSize: Size(30, 30),minimumSize:Size(30, 30) ),
                                       icon: Icon(FontAwesomeIcons.facebook,color: Colors.white,size: 15,),
                                       onPressed: ()=>launchURL(listaTodasEmpresas[i].facebook),
                                     ),
-                                    listaTodasEmpresas[i].whats.isEmpty?Container():IconButton(
+                                  ),
+                                  listaTodasEmpresas[i].whats.isEmpty?Container():Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 2.5),
+                                    width: 30,
+                                    child: IconButton(
+                                      padding: EdgeInsets.all(0),
                                       style: IconButton.styleFrom(backgroundColor: Cores.azul,maximumSize: Size(30, 30),minimumSize:Size(30, 30) ),
                                       icon: Icon(FontAwesomeIcons.whatsapp,color: Colors.white,size: 15,),
                                       onPressed: ()=>launchWhatsApp(listaTodasEmpresas[i].whats),
                                     ),
-                                    listaTodasEmpresas[i].site.isEmpty?Container():IconButton(
+                                  ),
+                                  listaTodasEmpresas[i].site.isEmpty?Container():Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 2.5),
+                                    width: 30,
+                                    child: IconButton(
+                                      padding: EdgeInsets.all(0),
                                       style: IconButton.styleFrom(backgroundColor: Cores.azul,maximumSize: Size(30, 30),minimumSize:Size(30, 30) ),
                                       icon: Icon(FontAwesomeIcons.globe,color: Colors.white,size: 15,),
                                       onPressed: ()=>launchURL(listaTodasEmpresas[i].site),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             );
                           },

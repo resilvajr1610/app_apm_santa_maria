@@ -5,9 +5,12 @@ import 'package:app_apm_santa_maria/componentes/dropdown_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/snackBars.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
+import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:app_apm_santa_maria/uteis/dado_padrao.dart';
 import 'package:brasil_fields/brasil_fields.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
@@ -15,7 +18,11 @@ import 'package:image_picker/image_picker.dart';
 import '../componentes/input_padrao.dart';
 
 class TelaCadastrarSocio extends StatefulWidget {
-  const TelaCadastrarSocio({super.key});
+  DocumentSnapshot? dadosUser;
+
+  TelaCadastrarSocio({
+   required this.dadosUser
+});
 
   @override
   State<TelaCadastrarSocio> createState() => _TelaCadastrarSocioState();
@@ -35,6 +42,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
   var email = TextEditingController();
   var senha = TextEditingController();
   var confirmarSenha = TextEditingController();
+  String fotoLink = '';
   XFile? foto;
   String? estadoSelecionado;
   Map <String,dynamic> dadosSocio = {};
@@ -65,23 +73,21 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                           if(senha.text.length>=5){
                             if(foto!=null){
                               dadosSocio={
-                                'nome': nome.text,
+                                'nome': nome.text.toUpperCase(),
                                 'cpf' : cpf.text,
                                 'contato': telefone.text,
-                                'rua'  : rua.text,
-                                'numeroCasa' : numero.text,
-                                'complemento' : complemento.text,
-                                'bairro': bairro.text,
+                                'rua'  : rua.text.toUpperCase(),
+                                'numeroCasa' : numero.text.toUpperCase(),
+                                'complemento' : complemento.text.toUpperCase(),
+                                'bairro': bairro.text.toUpperCase(),
                                 'cep' : cep.text,
-                                'cidade' : cidade.text,
+                                'cidade' : cidade.text.toUpperCase(),
                                 'estado' : estadoSelecionado,
                                 'email' : email.text,
                                 'senha' : senha.text,
                                 'foto' : foto
                               };
                               print('ok');
-                              //apenas avançar os dados para a próxima tela, só salvar quando tiver os dados de pelo menos um aluno
-                              //e só será criado o usuario no auth depois que o acesso for aceito pelo sistema
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
                             }else{
                               showSnackBar(context, 'Escolha uma foto de perfil para avançar', Colors.red);
@@ -120,7 +126,104 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
     }else{
       showSnackBar(context, 'Preencha seu nome para avançar', Colors.red);
     }
-    // Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno()));
+  }
+
+  verificarAlteracao(){
+    if(nome.text.isNotEmpty && nome.text.trim().contains(' ')){
+      if(GetUtils.isCpf(cpf.text)){
+        if(telefone.text.isNotEmpty && telefone.text.length > 13){
+          if(rua.text.isNotEmpty && rua.text.trim().contains(' ')){
+            if(numero.text.isNotEmpty){
+              if(bairro.text.isNotEmpty){
+                if(cep.text.length == 10){
+                  if(cidade.text.isNotEmpty){
+                    if(estadoSelecionado!=null){
+                      dadosSocio={
+                        'nome': nome.text.toUpperCase(),
+                        'cpf' : cpf.text.toUpperCase(),
+                        'contato': telefone.text.toUpperCase(),
+                        'rua'  : rua.text.toUpperCase(),
+                        'numeroCasa' : numero.text.toUpperCase(),
+                        'complemento' : complemento.text.toUpperCase(),
+                        'bairro': bairro.text.toUpperCase(),
+                        'cep' : cep.text.toUpperCase(),
+                        'cidade' : cidade.text.toUpperCase(),
+                        'estado' : estadoSelecionado,
+                      };
+                      salvarDados();
+                    }else{
+                      showSnackBar(context, 'Selecione seu estado para avançar', Colors.red);
+                    }
+                  }else{
+                    showSnackBar(context, 'Preencha a cidade para avançar', Colors.red);
+                  }
+                }else{
+                  showSnackBar(context, 'Preencha o CEP da sua rua para avançar', Colors.red);
+                }
+              }
+            }else{
+              showSnackBar(context, 'Preencha o número da sua casa para avançar', Colors.red);
+            }
+          }else{
+            showSnackBar(context, 'Preencha a rua para avançar', Colors.red);
+          }
+        }else{
+          showSnackBar(context, 'Telefone inválido', Colors.red);
+        }
+      }else{
+        showSnackBar(context, 'CPF inválido', Colors.red);
+      }
+    }else{
+      showSnackBar(context, 'Preencha seu nome para avançar', Colors.red);
+    }
+  }
+
+  preencherCampos(){
+    nome.text = widget.dadosUser!['nome'];
+    cpf.text = widget.dadosUser!['cpf'];
+    telefone.text = widget.dadosUser!['contato'];
+    rua.text = widget.dadosUser!['rua'];
+    numero.text = widget.dadosUser!['numeroCasa'];
+    bairro.text = widget.dadosUser!['bairro'];
+    complemento.text = widget.dadosUser!['complemento'];
+    cep.text = widget.dadosUser!['cep'];
+    cidade.text = widget.dadosUser!['cidade'].toString().toUpperCase();
+    estadoSelecionado = widget.dadosUser!['estado'];
+    fotoLink = widget.dadosUser!['foto'];
+    setState(() {});
+  }
+
+  salvarDados()async{
+    if(foto!=null){
+      Reference storageReference = FirebaseStorage.instance.ref().child('socios/${cpf.text.replaceAll('.', '').replaceAll('-', '')}_${DateTime.now().toIso8601String()+ ".jpg"}');
+      Uint8List archive = await foto!.readAsBytes();
+      UploadTask uploadTask = storageReference.putData(archive);
+
+      uploadTask.then((caminho) {
+        caminho.ref.getDownloadURL().then((link) {
+          String linkfoto = link.toString();
+
+          print('linkfoto');
+          print(linkfoto);
+          dadosSocio['foto'] = linkfoto;
+          FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+          });
+        });
+      });
+    }else{
+      FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if(widget.dadosUser!=null){
+      preencherCampos();
+    }
   }
 
   @override
@@ -129,13 +232,13 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
     double largura = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBarPadrao.appbar(context,'CADASTRO SÓCIO'),
+      appBar: AppBarPadrao.appbar(context,widget.dadosUser==null?'CADASTRO SÓCIO':'ATUALIZAR CADASTRO'),
       backgroundColor: Colors.white,
       body: Padding(
         padding: EdgeInsets.symmetric(vertical: 20,horizontal: 40),
         child: ListView(
           children: [
-            TextoPadrao(texto: 'Cadastro do sócio / responsável',cor: Cores.azul,tamanho: 14,negrito: true,),
+            TextoPadrao(texto: widget.dadosUser==null?'Cadastro do sócio / responsável':'',cor: Cores.azul,tamanho: 14,negrito: true,),
             InputPadrao(tituloTopo: 'Nome', controller: nome,paddingHorizontal: 0,paddingVertical: 5,),
             InputPadrao(
               tituloTopo: 'CPF',
@@ -229,21 +332,31 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                 ),
               ],
             ),
-            Divider(color: Cores.azul,),
-            TextoPadrao(texto: 'Dados de Login',cor: Cores.azul,tamanho: 14,negrito: true,),
-            InputPadrao(tituloTopo: 'E-mail', controller: email,paddingHorizontal: 0,paddingVertical: 5,textInputType: TextInputType.emailAddress,),
-            InputPadrao(tituloTopo: 'Senha', controller: senha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
-            InputPadrao(tituloTopo: 'Confirmar Senha', controller: confirmarSenha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
-            BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
+            widget.dadosUser!=null?Container():Divider(color: Cores.azul,),
+            widget.dadosUser!=null?Container():TextoPadrao(texto: 'Dados de Login',cor: Cores.azul,tamanho: 14,negrito: true,),
+            widget.dadosUser!=null?Container():InputPadrao(tituloTopo: 'E-mail', controller: email,paddingHorizontal: 0,paddingVertical: 5,textInputType: TextInputType.emailAddress,),
+            widget.dadosUser!=null?Container():InputPadrao(tituloTopo: 'Senha', controller: senha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
+            widget.dadosUser!=null?Container():InputPadrao(tituloTopo: 'Confirmar Senha', controller: confirmarSenha,paddingHorizontal: 0,paddingVertical: 5,ocultarTexto: true,),
+            widget.dadosUser!=null && foto ==null?Container(
+              padding: EdgeInsets.all(10),
+              child: GestureDetector(
+                onTap: ()=>pegarFoto(),
+                child: CircleAvatar(
+                  backgroundColor: Cores.input,
+                  maxRadius: 50,
+                  backgroundImage: NetworkImage(fotoLink),
+                ),
+              ),
+            ):BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
             BotaoTexto(
-              texto: 'Avançar',
+              texto: widget.dadosUser!=null?'Salvar':'Avançar',
               tamanhoTexto: 14,
               corBorda: Cores.azul,
               corBotao: Cores.azul,
               corTexto: Colors.white,
               tamanhoMaximo: Size(double.infinity,50),
               tamanhoMinimo: Size(double.infinity,50),
-              funcao: ()=>verificarCampos(),
+              funcao: ()=>widget.dadosUser==null?verificarCampos():verificarAlteracao(),
             )
           ],
         ),
