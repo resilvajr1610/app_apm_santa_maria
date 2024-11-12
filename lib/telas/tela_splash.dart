@@ -1,5 +1,6 @@
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_login.dart';
+import 'package:app_apm_santa_maria/telas/tela_publicacoes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class _TelaSplashState extends State<TelaSplash> {
     Future.delayed(
       Duration(seconds: 3),(){
         FirebaseAuth.instance.currentUser!=null?
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaEmprestimos())):
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaPublicacoes())):
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaLogin()));
       });
   }

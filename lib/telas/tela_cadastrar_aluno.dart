@@ -93,7 +93,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                 showSnackBar(context, 'Selecione o sexo do aluno', Colors.red);
               }
             }else{
-              showSnackBar(context, 'Selecione o ano série do aluno', Colors.red);
+              showSnackBar(context, 'Selecione a turma do aluno', Colors.red);
             }
           }else{
             showSnackBar(context, 'Data de nascimento está incompleto', Colors.red);
@@ -283,7 +283,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                   child: Container(
                       width: largura*0.38,
                       child: DropdownSeries(
-                        titulo: 'Ano/Série',
+                        titulo: 'Turma',
                         largura: largura*0.38,
                         lista: series,
                         selecionado: anoSelecionado,

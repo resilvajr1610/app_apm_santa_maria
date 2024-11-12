@@ -7,7 +7,7 @@ import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
-import 'package:app_apm_santa_maria/uteis/dado_padrao.dart';
+import 'package:app_apm_santa_maria/uteis/dados_padroes.dart';
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -321,7 +321,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                   width: largura*0.25,
                   title: '',
                   select: estadoSelecionado,
-                  list: DadoPadrao.estados,
+                  list: DadosPadroes.estados,
                   widthContainer: largura*0.1,
                   fontSize: 15,
                   hint: 'Estado',
@@ -344,7 +344,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                 child: CircleAvatar(
                   backgroundColor: Cores.input,
                   maxRadius: 50,
-                  backgroundImage: NetworkImage(fotoLink),
+                  backgroundImage:fotoLink==''?null: NetworkImage(fotoLink),
                 ),
               ),
             ):BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),

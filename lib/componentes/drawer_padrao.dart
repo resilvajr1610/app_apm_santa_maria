@@ -6,6 +6,7 @@ import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_conversas.dart';
 import 'package:app_apm_santa_maria/telas/tela_estatuto_pdf.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
+import 'package:app_apm_santa_maria/telas/tela_publicacoes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../telas/tela_login.dart';
@@ -61,7 +62,7 @@ class DrawerPadrao extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: Cores.input,
                   maxRadius: 33,
-                  backgroundImage: dadosUser == null ? null : NetworkImage(dadosUser!['foto']),
+                  backgroundImage: dadosUser == null || dadosUser!['foto']==''? null : NetworkImage(dadosUser!['foto']),
                 ),
               ),
               Padding(
@@ -80,6 +81,14 @@ class DrawerPadrao extends StatelessWidget {
                 funcao: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaEstatutoPDF())),
               ),
               ItemMenu(
+                titulo: 'Publicações',
+                icone: Icons.school,
+                funcao: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => TelaPublicacoes()),
+                ),
+              ),
+              ItemMenu(
                 titulo: 'Empréstimos',
                 icone: Icons.handshake,
                 funcao: () => Navigator.pushReplacement(
@@ -88,7 +97,7 @@ class DrawerPadrao extends StatelessWidget {
                 ),
               ),
               ItemMenu(
-                titulo: 'Empresas',
+                titulo: 'Empresas Conveniadas',
                 icone: Icons.business,
                 funcao: () => Navigator.push(
                   context,

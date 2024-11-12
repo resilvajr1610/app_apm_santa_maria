@@ -124,7 +124,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               child: CircleAvatar(
                 backgroundColor: Cores.input,
                 maxRadius: 33,
-                backgroundImage:dadosUser==null?null: NetworkImage(dadosUser!['foto']),
+                backgroundImage:dadosUser==null || dadosUser!['foto']==''?null: NetworkImage(dadosUser!['foto']),
               ),
             ),
             Padding(
@@ -172,7 +172,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                               child:CircleAvatar(
                                 backgroundColor: Cores.input,
                                 maxRadius: 33,
-                                backgroundImage:dadosUser==null?null: NetworkImage(alunos[i]['foto']),
+                                backgroundImage:dadosUser==null || alunos[i]['foto']==''?null: NetworkImage(alunos[i]['foto']),
                               ),
                             )
                         ),
@@ -200,7 +200,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                                 children: [
                                   TituloTexto(titulo: 'Matrícula', texto: alunos[i]['matricula']),
                                   Spacer(),
-                                  TituloTexto(titulo: 'Ano/série', texto:alunos[i]['serie']),
+                                  TituloTexto(titulo: 'Turma', texto:alunos[i]['serie']),
                                 ],
                               ),
                             ),
