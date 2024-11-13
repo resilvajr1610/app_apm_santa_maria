@@ -30,6 +30,7 @@ dependencies:
   url_launcher: ^6.1.7
   font_awesome_flutter: ^10.4.0
   cached_network_image: ^3.3.1
+  package_info_plus:
 
 dev_dependencies:
   flutter_test:

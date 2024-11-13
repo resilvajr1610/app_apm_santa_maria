@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_empresas.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
@@ -15,7 +14,11 @@ import 'item_menu.dart';
 
 class DrawerPadrao extends StatelessWidget {
   DocumentSnapshot? dadosUser;
-  DrawerPadrao({required this.dadosUser});
+  String? versao;
+  DrawerPadrao({
+    required this.dadosUser,
+    this.versao,
+  });
 
   Future<int> mensagens() async {
     final completer = Completer<int>();
@@ -28,10 +31,8 @@ class DrawerPadrao extends StatelessWidget {
         .listen((docMensagens) {
       completer.complete(docMensagens.docs.length);
     });
-
     return completer.future;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +148,7 @@ class DrawerPadrao extends StatelessWidget {
                 ),
               ),
               const Spacer(),
+              versao==null?Container():TextoPadrao(texto: 'versão $versao',cor: Cores.azul,tamanho: 14,),
               GestureDetector(
                 onTap: () => Navigator.pushReplacement(
                   context,

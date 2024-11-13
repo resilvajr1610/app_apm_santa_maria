@@ -27,7 +27,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
 
   List<PublicacaoModelo> publicacoes = [];
   var dadosUser;
-
+  String versao = '';
   carregarPublicacoes()async{
 
     FirebaseFirestore.instance.collection('publicacoes').where('situacao',isEqualTo: 'liberado' ).orderBy('data',descending: true).snapshots().listen((docPubs){
@@ -77,9 +77,15 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
     });
   }
 
+  pegarVersao()async{
+    versao = await DadosPadroes.pegarversao();
+    print('versao $versao');
+  }
+
   @override
-  void initState() {
+  void initState(){
     super.initState();
+    pegarVersao();
     carregarPublicacoes();
   }
 
@@ -98,7 +104,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
           SizedBox(width: 10,)
         ],
       ),
-      drawer: DrawerPadrao(dadosUser: dadosUser,),
+      drawer: DrawerPadrao(dadosUser: dadosUser,versao: versao,),
       body: Container(
         width: double.infinity,
         height: double.infinity,
