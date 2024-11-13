@@ -30,6 +30,10 @@ class _TelaLoginState extends State<TelaLogin> {
             FirebaseAuth.instance.signOut().then((_){
               showSnackBar(context, 'Sua conta foi excluída, entre em contato com a direção da escola', Cores.erro);
             });
+          }else if(BadStateTexto(docUser, 'acesso')=='solicitado_exclusao'){
+            FirebaseAuth.instance.signOut().then((_){
+              showSnackBar(context, 'Aguardando exclusão do quadro societário', Cores.erro);
+            });
           }else{
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaEmprestimos()));
           }

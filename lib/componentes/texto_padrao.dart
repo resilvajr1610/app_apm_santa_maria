@@ -23,7 +23,7 @@ class TextoPadrao extends StatelessWidget {
     return Text(
       texto,
       textAlign: textAlign,
-      maxLines: maxLinhas,
+      maxLines: maxLinhas ==0? null : maxLinhas,
       style: TextStyle(
         fontFamily: 'Nunito',
         color: cor,

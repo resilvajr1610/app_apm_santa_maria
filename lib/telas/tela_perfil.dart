@@ -46,7 +46,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
   salvarExclusao()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({
-      'acesso' : 'excluido'
+      'acesso' : 'solicitado_exclusao'
     }).then((_){
       FirebaseAuth.instance.signOut().then((_){
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaLogin()));
@@ -61,13 +61,13 @@ class _TelaPerfilState extends State<TelaPerfil> {
           return AlertDialog(
             backgroundColor: Cores.erro,
             title: TextoPadrao(texto: 'Aviso',cor: Colors.white,textAlign: TextAlign.center,tamanho: 16,negrito: true,),
-            content: TextoPadrao(texto: 'Deseja realmente excluir a sua conta?\nDados não poderão ser recuperados após a confimação!',cor: Colors.white,negrito:true,tamanho: 14,maxLinhas: 3,),
+            content: TextoPadrao(texto: 'Deseja realmente solicitar a excluisão a sua conta?\nNão poderá acessar o após a confimação!',cor: Colors.white,negrito:true,tamanho: 14,maxLinhas: 3,),
             actions: [
               BotaoTexto(
                 texto: 'Voltar',
                 arredodamento: 5,
                 tamanhoTexto: 14,
-                corBorda: Colors.green,
+                corBorda: Colors.white,
                 corBotao: Cores.azul,
                 corTexto: Colors.white,
                 tamanhoMaximo: Size(double.infinity,50),
@@ -76,7 +76,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               ),
               SizedBox(height: 10,),
               BotaoTexto(
-                texto: 'Confirmar exclusão',
+                texto: 'Confirmar solicitação',
                 arredodamento: 5,
                 tamanhoTexto: 14,
                 corBorda: Colors.white,
@@ -228,7 +228,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               funcao: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarSocio(dadosUser: dadosUser,))),
             ),
             BotaoTextoCustomizado(
-              texto: 'Excluir conta',
+              texto: 'Solicitar exclusão da conta',
               borda: 5,
               corBotao: Cores.erro,
               funcao: ()=>confirmarExcluirConta(),

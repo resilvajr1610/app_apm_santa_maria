@@ -30,7 +30,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
 
   carregarPublicacoes()async{
 
-    FirebaseFirestore.instance.collection('publicacoes').orderBy('data',descending: true).snapshots().listen((docPubs){
+    FirebaseFirestore.instance.collection('publicacoes').where('situacao',isEqualTo: 'liberado' ).orderBy('data',descending: true).snapshots().listen((docPubs){
       publicacoes.clear();
       for(int i =0; docPubs.docs.length > i; i++){
         publicacoes.add(
@@ -161,7 +161,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
                                         color: Cores.input,
                                         padding: EdgeInsets.all(20),
                                         width: largura*0.8,
-                                        child: TextoPadrao(texto: publicacoes[i].texto,cor: Colors.black87,maxLinhas: 10,tamanho: 16,textAlign: TextAlign.justify,),
+                                        child: TextoPadrao(texto: publicacoes[i].texto,cor: Colors.black87,maxLinhas: 0,tamanho: 16,textAlign: TextAlign.justify,),
                                       ),
                                       publicacoes[i].urlImagem==''?Container():Container(
                                         margin: EdgeInsets.all(20),
