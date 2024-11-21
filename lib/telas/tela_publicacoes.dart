@@ -3,6 +3,7 @@ import 'package:app_apm_santa_maria/modelos/publicacao_modelo.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -73,8 +74,28 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
   carregarUsuario(){
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
+      salvarTopicos(docUser);
       setState(() {});
     });
+  }
+
+  salvarTopicos(var user)async{
+    FirebaseMessaging.instance.subscribeToTopic('socio').then((_){
+      FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+        'topicos': FieldValue.arrayUnion(['socio'])
+      });
+    });
+    for(int i=0; user['alunos'].length>i; i++){
+      FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
+        FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
+          FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
+            FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+              'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+            });
+          });
+        });
+      });
+    }
   }
 
   pegarVersao()async{
@@ -86,6 +107,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
   void initState(){
     super.initState();
     pegarVersao();
+    carregarUsuario();
     carregarPublicacoes();
   }
 
