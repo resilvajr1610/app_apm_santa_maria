@@ -94,7 +94,12 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
                     'criado'            : DateTime.now(),
                   }).then((_){
                     if(widget.alunosAdicionados.length == i+1){
-                      FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({'alunos':ids}).then((_){
+                      FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({
+                        'alunos'   :ids,
+                        'tipo'     : 'socio',
+                        'situacao' : 'Adimplente',
+                        'acesso'   : 'liberado',
+                      }).then((_){
                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
                       });
                     }
