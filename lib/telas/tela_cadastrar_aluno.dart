@@ -6,6 +6,7 @@ import 'package:app_apm_santa_maria/componentes/dropdown_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/dropdown_series.dart';
 import 'package:app_apm_santa_maria/componentes/snackBars.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
 import 'package:app_apm_santa_maria/modelos/serie_modelo.dart';
 import 'package:app_apm_santa_maria/telas/tela_confirmar_cadastro.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
@@ -81,6 +82,10 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                     alunosAdicionados = repetido;
 
                     print('ok');
+                    print('widget.dadosSocio');
+                    print(widget.dadosSocio);
+                    print('alunosAdicionados');
+                    print(alunosAdicionados);
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>
                         TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
                   }else{
@@ -231,7 +236,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
   @override
   void initState() {
     super.initState();
-    if(widget.dadosSocio!=null){
+    if(widget.dadosSocio!=null && widget.alunosAdicionados.length !=0){
       carregarAlunos();
     }
     carregarSeries();
@@ -341,7 +346,9 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
               padding: EdgeInsets.all(10),
               child: GestureDetector(
                 onTap: ()=>pegarFoto(),
-                child: fotoLink==''?Container(): CircleAvatar(
+                child: fotoLink==''? Container(
+                  height: 50,child: Icon(Icons.add_a_photo,color: Cores.azul,size: 30,),) :
+                CircleAvatar(
                   backgroundColor: Cores.input,
                   maxRadius: 50,
                   backgroundImage: NetworkImage(fotoLink),

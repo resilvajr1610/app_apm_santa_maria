@@ -2,6 +2,7 @@ import 'package:app_apm_santa_maria/componentes/check_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/drawer_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/item_emprestimo.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
 import 'package:app_apm_santa_maria/sevicos/servico_notificacao.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -73,16 +74,18 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
         'topicos': FieldValue.arrayUnion(['socio'])
       });
     });
-    for(int i=0; user['alunos'].length>i; i++){
-      FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
-        FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
-          FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
-            FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
-              'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+    if(BadStateLista(user, 'alunos').isNotEmpty){
+      for(int i=0; user['alunos'].length>i; i++){
+        FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
+          FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
+            FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
+              FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+                'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+              });
             });
           });
         });
-      });
+      }
     }
   }
 
@@ -115,7 +118,7 @@ class _TelaEmprestimosState extends State<TelaEmprestimos> {
         backgroundColor: Cores.azul,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          Image.asset('assets/imagens/logo.png',height: 50,),
+          Image.asset('assets/imagens/logo.png',height: 40,),
           SizedBox(width: 10,)
         ],
       ),

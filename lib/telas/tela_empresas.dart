@@ -145,7 +145,7 @@ class _TelaEmpresasState extends State<TelaEmpresas> {
         backgroundColor: Cores.azul,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          Image.asset('assets/imagens/logo.png',height: 50,),
+          Image.asset('assets/imagens/logo.png',height: 40,),
           SizedBox(width: 10,)
         ],
       ),

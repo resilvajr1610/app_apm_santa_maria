@@ -1,5 +1,7 @@
 import 'package:app_apm_santa_maria/componentes/drawer_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
 import 'package:app_apm_santa_maria/modelos/publicacao_modelo.dart';
+import 'package:app_apm_santa_maria/telas/tela_cadastrar_socio.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +15,7 @@ import '../componentes/dropdown_perfil.dart';
 import '../componentes/input_padrao.dart';
 import '../componentes/snackBars.dart';
 import '../componentes/texto_padrao.dart';
+import '../modelos/bad_state_texto.dart';
 import '../modelos/empresa_modelo.dart';
 import '../modelos/perfil_modelo.dart';
 import '../uteis/cores.dart';
@@ -30,7 +33,6 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
   var dadosUser;
   String versao = '';
   carregarPublicacoes()async{
-
     FirebaseFirestore.instance.collection('publicacoes').where('situacao',isEqualTo: 'liberado' ).orderBy('data',descending: true).snapshots().listen((docPubs){
       publicacoes.clear();
       for(int i =0; docPubs.docs.length > i; i++){
@@ -74,6 +76,9 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
   carregarUsuario(){
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
+      if(BadStateTexto(docUser, 'rua')==''){
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaCadastrarSocio(dadosUser: docUser)));
+      }
       salvarTopicos(docUser);
       setState(() {});
     });
@@ -85,16 +90,18 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
         'topicos': FieldValue.arrayUnion(['socio'])
       });
     });
-    for(int i=0; user['alunos'].length>i; i++){
-      FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
-        FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
-          FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
-            FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
-              'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+    if(BadStateLista(user, 'alunos').isNotEmpty){
+      for(int i=0; user['alunos'].length>i; i++){
+        FirebaseMessaging.instance.subscribeToTopic(user['alunos'][i]).then((_){
+          FirebaseFirestore.instance.collection('alunos').doc(user['alunos'][i]).get().then((docAluno){
+            FirebaseMessaging.instance.subscribeToTopic(docAluno['idSerie']).then((_){
+              FirebaseFirestore.instance.collection('usuarios').doc(user.id).update({
+                'topicos': FieldValue.arrayUnion([docAluno['idSerie']])
+              });
             });
           });
         });
-      });
+      }
     }
   }
 
@@ -122,7 +129,7 @@ class _TelaPublicacoesState extends State<TelaPublicacoes> {
         backgroundColor: Cores.azul,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          Image.asset('assets/imagens/logo.png',height: 50,),
+          Image.asset('assets/imagens/logo.png',height: 40,),
           SizedBox(width: 10,)
         ],
       ),

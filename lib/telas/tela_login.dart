@@ -35,7 +35,11 @@ class _TelaLoginState extends State<TelaLogin> {
               showSnackBar(context, 'Aguardando exclusão do quadro societário', Cores.erro);
             });
           }else{
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaEmprestimos()));
+            if(BadStateTexto(docUser, 'rua')!=''){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaEmprestimos()));
+            }else{
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaCadastrarSocio(dadosUser: docUser)));
+            }
           }
         });
       }).catchError((error){

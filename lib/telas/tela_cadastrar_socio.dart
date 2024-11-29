@@ -4,6 +4,15 @@ import 'package:app_apm_santa_maria/componentes/botao_texto.dart';
 import 'package:app_apm_santa_maria/componentes/dropdown_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/snackBars.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
@@ -85,7 +94,8 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                                 'estado' : estadoSelecionado,
                                 'email' : email.text,
                                 'senha' : senha.text,
-                                'foto' : foto
+                                'foto' : foto,
+                                'perfil' : widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
                               };
                               print('ok');
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
@@ -149,6 +159,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                         'cep' : cep.text.toUpperCase(),
                         'cidade' : cidade.text.toUpperCase(),
                         'estado' : estadoSelecionado,
+                        'perfil' : widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
                       };
                       salvarDados();
                     }else{
@@ -179,17 +190,17 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
   }
 
   preencherCampos(){
-    nome.text = widget.dadosUser!['nome'];
-    cpf.text = widget.dadosUser!['cpf'];
-    telefone.text = widget.dadosUser!['contato'];
-    rua.text = widget.dadosUser!['rua'];
-    numero.text = widget.dadosUser!['numeroCasa'];
-    bairro.text = widget.dadosUser!['bairro'];
-    complemento.text = widget.dadosUser!['complemento'];
-    cep.text = widget.dadosUser!['cep'];
-    cidade.text = widget.dadosUser!['cidade'].toString().toUpperCase();
-    estadoSelecionado = widget.dadosUser!['estado'];
-    fotoLink = widget.dadosUser!['foto'];
+    nome.text = BadStateTexto(widget.dadosUser!,'nome');
+    cpf.text = BadStateTexto(widget.dadosUser!,'cpf');
+    telefone.text = BadStateTexto(widget.dadosUser!,'contato');
+    rua.text = BadStateTexto(widget.dadosUser!,'rua');
+    numero.text = BadStateTexto(widget.dadosUser!,'numeroCasa');
+    bairro.text = BadStateTexto(widget.dadosUser!,'bairro');
+    complemento.text = BadStateTexto(widget.dadosUser!,'complemento');
+    cep.text = BadStateTexto(widget.dadosUser!,'cep');
+    cidade.text = BadStateTexto(widget.dadosUser!,'cidade').toString().toUpperCase();
+    estadoSelecionado = BadStateTexto(widget.dadosUser, 'estado')==''?null:widget.dadosUser!['estado'];
+    fotoLink = BadStateTexto(widget.dadosUser!,'foto');
     setState(() {});
   }
 
@@ -207,13 +218,21 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
           print(linkfoto);
           dadosSocio['foto'] = linkfoto;
           FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+            if(BadStateLista(widget.dadosUser!,'alunos').isEmpty){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
+            }else{
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+            }
           });
         });
       });
     }else{
       FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+        if(BadStateLista(widget.dadosUser!,'alunos').isEmpty){
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
+        }else{
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+        }
       });
     }
   }
@@ -349,7 +368,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
               ),
             ):BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
             BotaoTexto(
-              texto: widget.dadosUser!=null?'Salvar':'Avançar',
+              texto: BadStateLista(widget.dadosUser,'fotos').isNotEmpty?'Salvar':'Avançar',
               tamanhoTexto: 14,
               corBorda: Cores.azul,
               corBotao: Cores.azul,

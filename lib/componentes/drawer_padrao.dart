@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_empresas.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
 import 'package:app_apm_santa_maria/telas/tela_conversas.dart';
@@ -63,7 +64,7 @@ class DrawerPadrao extends StatelessWidget {
                 child: CircleAvatar(
                   backgroundColor: Cores.input,
                   maxRadius: 33,
-                  backgroundImage: dadosUser == null || dadosUser!['foto']==''? null : NetworkImage(dadosUser!['foto']),
+                  backgroundImage: dadosUser == null || BadStateTexto(dadosUser!,'foto')==''? null : NetworkImage(dadosUser!['foto']),
                 ),
               ),
               Padding(

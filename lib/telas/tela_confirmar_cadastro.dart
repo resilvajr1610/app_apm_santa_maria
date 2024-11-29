@@ -3,6 +3,7 @@ import 'package:app_apm_santa_maria/componentes/appbar_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/botao_texto.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/titulo_texto.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
 import 'package:app_apm_santa_maria/telas/tela_termo_adesao.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
@@ -42,24 +43,40 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
             Container(
               padding: EdgeInsets.symmetric(vertical: 10),
               alignment: Alignment.centerLeft,
-              child: CircleAvatar(
+              child: widget.alunosAdicionados.isEmpty?Container():CircleAvatar(
                 backgroundColor: Cores.input,
                 maxRadius: 30,
-                child: ClipOval(child: Image.file(File(widget.dadosSocio['foto']!.path),width: 100,height: 100,fit: BoxFit.cover,)),
+                child: ClipOval(
+                  child: widget.dadosSocio['foto'] != null
+                      ? Image.file(
+                    File(widget.dadosSocio['foto'].path),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  )
+                      : Icon(
+                    Icons.person, // Ícone padrão caso a foto seja nula
+                    size: 30,
+                  ),
+                ),
               )
             ),
-            TituloTexto(titulo: 'Nome', texto: 'Nome completo'),
+            TituloTexto(titulo: 'Nome', texto: widget.dadosSocio['nome']),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TituloTexto(titulo: 'CPF', texto: '000.000.000-00'),
+                TituloTexto(titulo: 'CPF', texto: widget.dadosSocio['cpf']),
                 Container(
                   width: largura*0.4,
-                  child: TituloTexto(titulo: 'Telefone', texto: '(00) 00000 - 0000')
+                  child: TituloTexto(titulo: 'Telefone', texto: widget.dadosSocio['contato'])
                 ),
               ],
             ),
-            TituloTexto(titulo: 'Endereço', texto: 'Endereço completo, nº 1, bairro, cidade'),
+            TituloTexto(
+                maxLinhas: 3,
+                titulo: 'Endereço',
+                texto: '${widget.dadosSocio['rua']}, nº ${widget.dadosSocio['numeroCasa']}, ${widget.dadosSocio['bairro']}, ${widget.dadosSocio['cidade']}'
+            ),
             Divider(color: Cores.azul,),
             TextoPadrao(texto: 'Aluno',cor: Cores.azul,tamanho: 14,negrito: true,),
             Container(
@@ -132,7 +149,7 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
               tamanhoMaximo: Size(double.infinity,50),
               tamanhoMinimo: Size(double.infinity,50),
               funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
-                  TelaTermoAdesao(alunosAdicionados: widget.alunosAdicionados,dadosSocio: widget.dadosSocio,))),
+                  TelaTermoAdesao(alunosAdicionados: widget.alunosAdicionados,dadosSocio: widget.dadosSocio!,))),
             )
           ],
         ),

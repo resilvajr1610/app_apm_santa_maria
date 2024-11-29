@@ -1,6 +1,7 @@
-import 'dart:io';
-
 import 'package:app_apm_santa_maria/componentes/botao_texto_customizado.dart';
+import 'package:app_apm_santa_maria/componentes/input_padrao.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
+import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_socio.dart';
 import 'package:app_apm_santa_maria/telas/tela_login.dart';
@@ -24,11 +25,12 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
   DocumentSnapshot? dadosUser;
   List<DocumentSnapshot> alunos = [];
+  TextEditingController motivo = TextEditingController();
 
   carregarUsuario()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
-      if(dadosUser!['alunos'].isNotEmpty){
+      if(BadStateLista(dadosUser!,'alunos').isNotEmpty){
         carregarAlunos();
       }
       setState(() {});
@@ -46,7 +48,8 @@ class _TelaPerfilState extends State<TelaPerfil> {
 
   salvarExclusao()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({
-      'acesso' : 'solicitado_exclusao'
+      'acesso' : 'solicitado_exclusao',
+      'motivo' : motivo.text,
     }).then((_){
       FirebaseAuth.instance.signOut().then((_){
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaLogin()));
@@ -61,7 +64,13 @@ class _TelaPerfilState extends State<TelaPerfil> {
           return AlertDialog(
             backgroundColor: Cores.erro,
             title: TextoPadrao(texto: 'Aviso',cor: Colors.white,textAlign: TextAlign.center,tamanho: 16,negrito: true,),
-            content: TextoPadrao(texto: 'Deseja realmente solicitar a excluisão a sua conta?\nNão poderá acessar o após a confimação!',cor: Colors.white,negrito:true,tamanho: 14,maxLinhas: 3,),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextoPadrao(texto: 'Deseja realmente solicitar a exclusão a sua conta?\nNão poderá acessar o após a confimação!',cor: Colors.white,negrito:true,tamanho: 14,maxLinhas: 3,),
+                InputPadrao(tituloTopo: 'Motivo', controller: motivo,paddingHorizontal: 0,corTitulo: Colors.white,hint: 'Insira o motivo da exclusão',)
+              ],
+            ),
             actions: [
               BotaoTexto(
                 texto: 'Voltar',
@@ -109,7 +118,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
         backgroundColor: Cores.azul,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          Image.asset('assets/imagens/logo.png',height: 50,),
+          Image.asset('assets/imagens/logo.png',height: 40,),
           SizedBox(width: 10,)
         ],
       ),
@@ -124,7 +133,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
               child: CircleAvatar(
                 backgroundColor: Cores.input,
                 maxRadius: 33,
-                backgroundImage:dadosUser==null || dadosUser!['foto']==''?null: NetworkImage(dadosUser!['foto']),
+                backgroundImage:dadosUser==null || BadStateTexto(dadosUser!,'foto')==''?null: NetworkImage(dadosUser!['foto']),
               ),
             ),
             Padding(
@@ -144,8 +153,14 @@ class _TelaPerfilState extends State<TelaPerfil> {
                 TextoPadrao(texto: 'Endereço:     ',cor: Cores.azul,tamanho: 12,textAlign: TextAlign.center),
                 Container(
                   width: largura*0.6,
-                  child: TextoPadrao(texto: '${dadosUser!['rua']}, n° ${dadosUser!['numeroCasa']}, ${dadosUser!['bairro']}, ${dadosUser!['cidade'].toString().toUpperCase()}, '
-                      '${dadosUser!['estado']}, CEP ${dadosUser!['cep']}',cor: Cores.texto,tamanho: 12,textAlign: TextAlign.start,maxLinhas: 5,),
+                  child:
+                    BadStateTexto(dadosUser!, 'rua').isEmpty?
+                    Container():
+                      TextoPadrao(
+                        texto: '${dadosUser!['rua']}, n° ${dadosUser!['numeroCasa']}, ${dadosUser!['bairro']}, ${dadosUser!['cidade'].toString().toUpperCase()}, '
+                          '${dadosUser!['estado']}, CEP ${dadosUser!['cep']}',
+                        cor: Cores.texto,tamanho: 12,textAlign: TextAlign.start,maxLinhas: 5,
+                      ),
                 ),
               ],
             ),
@@ -160,7 +175,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                     return Divider(indent: 20,endIndent: 20,height: 50,);
                   },
                   itemBuilder: (context,i){
-                    return Row(
+                    return BadStateTexto(alunos[i],'nome')==''?Container():Row(
                       children: [
                         Container(
                             padding: EdgeInsets.symmetric(vertical: 10),
@@ -172,7 +187,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                               child:CircleAvatar(
                                 backgroundColor: Cores.input,
                                 maxRadius: 33,
-                                backgroundImage:dadosUser==null || alunos[i]['foto']==''?null: NetworkImage(alunos[i]['foto']),
+                                backgroundImage:dadosUser==null || BadStateTexto(alunos[i],'foto')==''?null: NetworkImage(alunos[i]['foto']),
                               ),
                             )
                         ),
@@ -183,7 +198,7 @@ class _TelaPerfilState extends State<TelaPerfil> {
                               width: largura*0.7,
                               child: Row(
                                 children: [
-                                  TituloTexto(titulo: 'Nome', texto: alunos[i]['nome']),
+                                  TituloTexto(titulo: 'Nome', texto: BadStateTexto(alunos[i],'nome')),
                                   Spacer(),
                                   IconButton(
                                       style: IconButton.styleFrom(backgroundColor: Cores.azul),
@@ -193,14 +208,14 @@ class _TelaPerfilState extends State<TelaPerfil> {
                                 ],
                               ),
                             ),
-                            TituloTexto(titulo: 'Nome de guerra', texto: alunos[i]['nomeGuerra']),
+                            TituloTexto(titulo: 'Nome de guerra', texto: BadStateTexto(alunos[i],'nomeGuerra')),
                             Container(
                               width: largura*0.65,
                               child: Row(
                                 children: [
-                                  TituloTexto(titulo: 'Matrícula', texto: alunos[i]['matricula']),
+                                  TituloTexto(titulo: 'Matrícula', texto: BadStateTexto(alunos[i],'matricula')),
                                   Spacer(),
-                                  TituloTexto(titulo: 'Turma', texto:alunos[i]['serie']),
+                                  TituloTexto(titulo: 'Turma', texto: BadStateTexto(alunos[i],'serie')),
                                 ],
                               ),
                             ),
@@ -208,13 +223,13 @@ class _TelaPerfilState extends State<TelaPerfil> {
                               width: largura*0.65,
                               child: Row(
                                 children: [
-                                  TituloTexto(titulo: 'Nascimento', texto: alunos[i]['nascimento']),
+                                  TituloTexto(titulo: 'Nascimento', texto:BadStateTexto(alunos[i],'nascimento')),
                                   Spacer(),
-                                  TituloTexto(titulo: 'Sexo', texto: alunos[i]['sexo'])
+                                  TituloTexto(titulo: 'Sexo', texto: BadStateTexto(alunos[i],'sexo'))
                                 ],
                               ),
                             ),
-                            TituloTexto(titulo: 'Religião', texto: alunos[i]['religiao']),
+                            TituloTexto(titulo: 'Religião', texto: BadStateTexto(alunos[i],'religiao')),
                           ],
                         ),
                       ],

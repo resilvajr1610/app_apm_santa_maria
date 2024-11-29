@@ -1,11 +1,14 @@
 import 'package:app_apm_santa_maria/componentes/appbar_padrao.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/telas/tela_aguardar.dart';
+import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import '../componentes/botao_texto.dart';
 import '../uteis/cores.dart';
 
@@ -25,7 +28,10 @@ class TelaTermoAdesao extends StatefulWidget {
 class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
 
   salvarDados()async{
-    if(widget.dadosSocio['foto'] is! String){
+
+    List ids = [];
+
+    if(widget.dadosSocio['foto'] is! String && widget.dadosSocio['foto']!=null){
       Reference storageReference = FirebaseStorage.instance.ref().child('socios/${widget.dadosSocio['cpf'].toString().replaceAll('.', '').replaceAll('-', '')}_${DateTime.now().toIso8601String()+ ".jpg"}');
       Uint8List archive = await widget.dadosSocio['foto'].readAsBytes();
       UploadTask uploadTask = storageReference.putData(archive);
@@ -48,28 +54,60 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
         UploadTask uploadTask = storageReference.putData(archive);
 
         uploadTask.then((caminho) {
-          caminho.ref.getDownloadURL().then((link) {
+          caminho.ref.getDownloadURL().then((link)async {
             String linkfoto = link.toString();
 
             print('linkfoto');
             print(linkfoto);
             widget.alunosAdicionados[i]['foto'] = linkfoto;
+
+            if(i+1==widget.alunosAdicionados.length){
+              String? token = await FirebaseMessaging.instance.getToken();
+              print(widget.dadosSocio);
+              if(widget.dadosSocio['perfil']==''){
+                final docRef = FirebaseFirestore.instance.collection('aprovacao').doc();
+                FirebaseFirestore.instance.collection('aprovacao').doc(docRef.id).set({
+                  'id' : docRef.id,
+                  'situacao' : 'aguardando',
+                  'dadosSocio' : widget.dadosSocio,
+                  'alunosAdicionados' : widget.alunosAdicionados,
+                  'token' : token
+                }).then((_){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaAguardar()));
+                });
+              }else{
+                for(int i = 0; widget.alunosAdicionados.length > i; i++){
+                  final docRefAlunos = FirebaseFirestore.instance.collection('alunos').doc();
+                  ids.add(docRefAlunos.id);
+                  FirebaseFirestore.instance.collection('alunos').doc(docRefAlunos.id).set({
+                    'idAluno'           : docRefAlunos.id,
+                    'foto'              : widget.alunosAdicionados[i]['foto'],
+                    'idSerie'           : widget.alunosAdicionados[i]['idSerie'],
+                    'serie'             : widget.alunosAdicionados[i]['serie'],
+                    'matricula'         : widget.alunosAdicionados[i]['matricula'],
+                    'nascimento'        : widget.alunosAdicionados[i]['nascimento'],
+                    'nome'              : widget.alunosAdicionados[i]['nome'],
+                    'nomeGuerra'        : widget.alunosAdicionados[i]['nomeGuerra'],
+                    'religiao'          : widget.alunosAdicionados[i]['religiao'],
+                    'sexo'              : widget.alunosAdicionados[i]['sexo'],
+                    'responsavelCriacao': FirebaseAuth.instance.currentUser!.email,
+                    'criado'            : DateTime.now(),
+                  }).then((_){
+                    if(widget.alunosAdicionados.length == i+1){
+                      FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).update({'alunos':ids}).then((_){
+                        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+                      });
+                    }
+                  });
+                }
+              }
+            }
           });
         });
+      }else{
+
       }
-      if(i+1==widget.alunosAdicionados.length){
-        String? token = await FirebaseMessaging.instance.getToken();
-        final docRef = FirebaseFirestore.instance.collection('aprovacao').doc();
-        FirebaseFirestore.instance.collection('aprovacao').doc(docRef.id).set({
-          'id' : docRef.id,
-          'situacao' : 'aguardando',
-          'dadosSocio' : widget.dadosSocio,
-          'alunosAdicionados' : widget.alunosAdicionados,
-          'token' : token
-        }).then((_){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>TelaAguardar()));
-        });
-      }
+
     }
   }
 
