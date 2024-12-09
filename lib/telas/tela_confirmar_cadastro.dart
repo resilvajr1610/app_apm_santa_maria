@@ -25,7 +25,6 @@ class TelaConfirmarCadastro extends StatefulWidget {
 class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
 
   String? sexoSelecionado;
-  String? religiaoSelecionado;
   String? anoSelecionado;
 
   @override
@@ -118,7 +117,6 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
                           ),
                         ],
                       ),
-                      TituloTexto(titulo: 'Religião', texto: widget.alunosAdicionados[i]['religiao']),
                     ],
                   );
                 }

@@ -88,7 +88,6 @@ class _TelaTermoAdesaoState extends State<TelaTermoAdesao> {
                     'nascimento'        : widget.alunosAdicionados[i]['nascimento'],
                     'nome'              : widget.alunosAdicionados[i]['nome'],
                     'nomeGuerra'        : widget.alunosAdicionados[i]['nomeGuerra'],
-                    'religiao'          : widget.alunosAdicionados[i]['religiao'],
                     'sexo'              : widget.alunosAdicionados[i]['sexo'],
                     'responsavelCriacao': FirebaseAuth.instance.currentUser!.email,
                     'criado'            : DateTime.now(),

@@ -35,7 +35,6 @@ class TelaCadastrarAluno extends StatefulWidget {
 class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
 
   String? sexoSelecionado;
-  String? religiaoSelecionado;
   SerieModelo? anoSelecionado;
 
   TextEditingController nomeAluno = TextEditingController();
@@ -56,43 +55,38 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
           if(nascimento.text.length==10){
             if(anoSelecionado!=null){
               if(sexoSelecionado!=null){
-                if(religiaoSelecionado!=null){
-                  if(foto!=null){
-                    dadosAlunoAtual = {};
-                    dadosAlunoAtual={
-                      'nome': nomeAluno.text,
-                      'nomeGuerra' : nomeGuerra.text,
-                      'matricula': matricula.text,
-                      'nascimento'  : nascimento.text,
-                      'serie' : anoSelecionado!.nome,
-                      'idSerie' : anoSelecionado!.id,
-                      'sexo': sexoSelecionado,
-                      'religiao' : religiaoSelecionado,
-                      'foto' : foto,
-                      'indice' : alunosAdicionados.length
-                    };
-                    alunosAdicionados.add(dadosAlunoAtual);
+                if(foto!=null){
+                  dadosAlunoAtual = {};
+                  dadosAlunoAtual={
+                    'nome': nomeAluno.text,
+                    'nomeGuerra' : nomeGuerra.text,
+                    'matricula': matricula.text,
+                    'nascimento'  : nascimento.text,
+                    'serie' : anoSelecionado!.nome,
+                    'idSerie' : anoSelecionado!.id,
+                    'sexo': sexoSelecionado,
+                    'foto' : foto,
+                    'indice' : alunosAdicionados.length
+                  };
+                  alunosAdicionados.add(dadosAlunoAtual);
 
-                    List<Map<String, dynamic>> repetido = alunosAdicionados
-                        .map((aluno) => aluno['matricula']) // Mapeia para pegar os IDs
-                        .toSet() // Converte para Set para remover duplicados
-                        .map((matricula) => alunosAdicionados.firstWhere((aluno) => aluno['matricula'] == matricula)) // Recupera os alunos únicos
-                        .toList(); // Converte de volta para List
+                  List<Map<String, dynamic>> repetido = alunosAdicionados
+                      .map((aluno) => aluno['matricula']) // Mapeia para pegar os IDs
+                      .toSet() // Converte para Set para remover duplicados
+                      .map((matricula) => alunosAdicionados.firstWhere((aluno) => aluno['matricula'] == matricula)) // Recupera os alunos únicos
+                      .toList(); // Converte de volta para List
 
-                    alunosAdicionados = repetido;
+                  alunosAdicionados = repetido;
 
-                    print('ok');
-                    print('widget.dadosSocio');
-                    print(widget.dadosSocio);
-                    print('alunosAdicionados');
-                    print(alunosAdicionados);
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                        TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
-                  }else{
-                    showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
-                  }
+                  print('ok');
+                  print('widget.dadosSocio');
+                  print(widget.dadosSocio);
+                  print('alunosAdicionados');
+                  print(alunosAdicionados);
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                      TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
                 }else{
-                  showSnackBar(context, 'Selecione a religião do aluno', Colors.red);
+                  showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
                 }
               }else{
                 showSnackBar(context, 'Selecione o sexo do aluno', Colors.red);
@@ -122,15 +116,11 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
           if(nascimento.text.length==10){
             if(anoSelecionado!=null){
               if(sexoSelecionado!=null){
-                if(religiaoSelecionado!=null){
-                  if(foto!=null || fotoLink!=''){
-                    print('ok');
-                    salvarDados();
-                  }else{
-                    showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
-                  }
+                if(foto!=null || fotoLink!=''){
+                  print('ok');
+                  salvarDados();
                 }else{
-                  showSnackBar(context, 'Selecione a religião do aluno', Colors.red);
+                  showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
                 }
               }else{
                 showSnackBar(context, 'Selecione o sexo do aluno', Colors.red);
@@ -163,7 +153,6 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
       'serie' : anoSelecionado!.nome,
       'idSerie' : anoSelecionado!.id,
       'sexo': sexoSelecionado,
-      'religiao' : religiaoSelecionado,
     };
     if(foto!=null){
       Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${DateTime.now().toIso8601String()+ ".jpg"}');
@@ -228,7 +217,6 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     nascimento.text = widget.alunosAdicionados[0]['nascimento'];
     anoSelecionado = series.firstWhere((serie) => serie.id == widget.alunosAdicionados[0]['idSerie']);
     sexoSelecionado = widget.alunosAdicionados[0]['sexo'];
-    religiaoSelecionado = widget.alunosAdicionados[0]['religiao'];
     fotoLink = widget.alunosAdicionados[0]['foto'];
     setState(() {});
   }
@@ -319,29 +307,6 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
               ],
             ),
             SizedBox(height: 5,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                    width: largura*0.38,
-                    child: DropDownPadrao(
-                      title: 'Religião',
-                      width: largura*0.38,
-                      list: ['Católica','Evangélica','Não tem religião','Espírita','Outra','Ateu','Judaica'],
-                      select: religiaoSelecionado,
-                      fontSize: 14,
-                      widthContainer: largura*0.27,
-                      onChanged: (valor){
-                        religiaoSelecionado = valor;
-                        setState(() {});
-                      },
-                    )
-                ),
-                Container(
-                  width: largura*0.38,
-                ),
-              ],
-            ),
             widget.dadosSocio==null && foto ==null?Container(
               padding: EdgeInsets.all(10),
               child: GestureDetector(

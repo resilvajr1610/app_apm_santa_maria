@@ -6,13 +6,6 @@ import 'package:app_apm_santa_maria/componentes/snackBars.dart';
 import 'package:app_apm_santa_maria/componentes/texto_padrao.dart';
 import 'package:app_apm_santa_maria/modelos/bad_state_lista.dart';
 import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
-import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_aluno.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
@@ -95,7 +88,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                                 'email' : email.text,
                                 'senha' : senha.text,
                                 'foto' : foto,
-                                'perfil' : widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
+                                'perfil' : widget.dadosUser==null?'':widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
                               };
                               print('ok');
                               Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
@@ -368,7 +361,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
               ),
             ):BotaoCamera(funcao: ()=>pegarFoto(),foto: foto!=null?foto:null,),
             BotaoTexto(
-              texto: BadStateLista(widget.dadosUser,'fotos').isNotEmpty?'Salvar':'Avançar',
+              texto: widget.dadosUser==null?'Salvar':'Avançar',
               tamanhoTexto: 14,
               corBorda: Cores.azul,
               corBotao: Cores.azul,

@@ -229,7 +229,6 @@ class _TelaPerfilState extends State<TelaPerfil> {
                                 ],
                               ),
                             ),
-                            TituloTexto(titulo: 'Religião', texto: BadStateTexto(alunos[i],'religiao')),
                           ],
                         ),
                       ],

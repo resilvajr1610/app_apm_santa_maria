@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:686224316610:android:c3dcee1b6a8375adbc835b",
+        "android_client_info": {
+          "package_name": "com.apm.app_apm_santa_maria"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfIXqegPP96I59uwhsNhuyk9ASdqOW724"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:686224316610:android:1e760eb3dd0e4ca5bc835b",
         "android_client_info": {
           "package_name": "com.example.app_apm_santa_maria"
