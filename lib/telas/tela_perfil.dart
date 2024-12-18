@@ -24,12 +24,31 @@ class TelaPerfil extends StatefulWidget {
 class _TelaPerfilState extends State<TelaPerfil> {
 
   DocumentSnapshot? dadosUser;
+  Map<String,dynamic> socio = {};
   List<DocumentSnapshot> alunos = [];
   TextEditingController motivo = TextEditingController();
 
   carregarUsuario()async{
     FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser!.uid).get().then((docUser){
       dadosUser = docUser;
+
+      socio={
+        'nome'        : BadStateTexto(docUser,'nome'),
+        'cpf'         : BadStateTexto(docUser,'cpf'),
+        'contato'     : BadStateTexto(docUser,'contato'),
+        'rua'         : BadStateTexto(docUser,'rua'),
+        'numeroCasa'  : BadStateTexto(docUser,'numeroCasa'),
+        'complemento' : BadStateTexto(docUser, 'complemento'),
+        'bairro'      : BadStateTexto(docUser, 'bairro'),
+        'cep'         : BadStateTexto(docUser, 'cep'),
+        'cidade'      : BadStateTexto(docUser, 'cidade'),
+        'estado'      : BadStateTexto(docUser, 'estado'),
+        'email'       : BadStateTexto(docUser, 'email'),
+        'senha'       : BadStateTexto(docUser, 'senha'),
+        'foto'        : BadStateTexto(docUser, 'foto'),
+        'perfil'      : BadStateTexto(docUser, 'perfil'),
+      };
+      print(socio);
       if(BadStateLista(dadosUser!,'alunos').isNotEmpty){
         carregarAlunos();
       }
@@ -165,9 +184,18 @@ class _TelaPerfilState extends State<TelaPerfil> {
               ],
             ),
             Divider(color: Cores.azul,indent: 0,endIndent: 0,thickness: 2,),
-            TextoPadrao(texto: 'Alunos:',cor: Cores.azul,tamanho: 14,negrito: true,),
+            Row(
+              children: [
+                TextoPadrao(texto: 'Alunos:',cor: Cores.azul,tamanho: 14,negrito: true,),
+                IconButton(
+                  style: IconButton.styleFrom(backgroundColor: Cores.azul),
+                  icon: Icon(Icons.add,color: Colors.white,),
+                  onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: socio, alunosAdicionados: [],adicionarAluno: true,))),
+                )
+              ],
+            ),
             Container(
-              height: alunos.length*190,
+              height: alunos.length*210,
               child: ListView.separated(
                   physics: NeverScrollableScrollPhysics(),
                   itemCount: alunos.length,
@@ -203,32 +231,16 @@ class _TelaPerfilState extends State<TelaPerfil> {
                                   IconButton(
                                       style: IconButton.styleFrom(backgroundColor: Cores.azul),
                                       icon: Icon(Icons.edit,color: Colors.white,),
-                                      onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: null, alunosAdicionados: [alunos[i]]))),
+                                      onPressed: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: null, alunosAdicionados: [alunos[i]],adicionarAluno: false,))),
                                   )
                                 ],
                               ),
                             ),
                             TituloTexto(titulo: 'Nome de guerra', texto: BadStateTexto(alunos[i],'nomeGuerra')),
-                            Container(
-                              width: largura*0.65,
-                              child: Row(
-                                children: [
-                                  TituloTexto(titulo: 'Matrícula', texto: BadStateTexto(alunos[i],'matricula')),
-                                  Spacer(),
-                                  TituloTexto(titulo: 'Turma', texto: BadStateTexto(alunos[i],'serie')),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: largura*0.65,
-                              child: Row(
-                                children: [
-                                  TituloTexto(titulo: 'Nascimento', texto:BadStateTexto(alunos[i],'nascimento')),
-                                  Spacer(),
-                                  TituloTexto(titulo: 'Sexo', texto: BadStateTexto(alunos[i],'sexo'))
-                                ],
-                              ),
-                            ),
+                            TituloTexto(titulo: 'Número do aluno', texto: BadStateTexto(alunos[i],'matricula')),
+                            TituloTexto(titulo: 'Turma', texto: BadStateTexto(alunos[i],'serie')),
+                            TituloTexto(titulo: 'Nascimento', texto:BadStateTexto(alunos[i],'nascimento')),
+                            TituloTexto(titulo: 'Sexo', texto: BadStateTexto(alunos[i],'sexo'))
                           ],
                         ),
                       ],

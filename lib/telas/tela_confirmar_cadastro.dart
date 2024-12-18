@@ -46,7 +46,7 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
                 backgroundColor: Cores.input,
                 maxRadius: 30,
                 child: ClipOval(
-                  child: widget.dadosSocio['foto'] != null
+                  child: widget.dadosSocio['foto'] != null && widget.dadosSocio['foto'].toString().contains('file://')
                       ? Image.file(
                     File(widget.dadosSocio['foto'].path),
                     width: 100,
@@ -134,7 +134,7 @@ class _TelaConfirmarCadastroState extends State<TelaConfirmarCadastro> {
                 tamanhoMaximo: Size(double.infinity,50),
                 tamanhoMinimo: Size(double.infinity,50),
                 funcao: ()=>Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>
-                    TelaCadastrarAluno(dadosSocio: widget.dadosSocio,alunosAdicionados: widget.alunosAdicionados,))),
+                    TelaCadastrarAluno(dadosSocio: widget.dadosSocio,alunosAdicionados: widget.alunosAdicionados,adicionarAluno: false,))),
               ),
             ),
             BotaoTexto(

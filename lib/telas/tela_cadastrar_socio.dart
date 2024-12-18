@@ -91,7 +91,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                                 'perfil' : widget.dadosUser==null?'':widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
                               };
                               print('ok');
-                              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
+                              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],adicionarAluno: false,)));
                             }else{
                               showSnackBar(context, 'Escolha uma foto de perfil para avançar', Colors.red);
                             }
@@ -152,7 +152,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
                         'cep' : cep.text.toUpperCase(),
                         'cidade' : cidade.text.toUpperCase(),
                         'estado' : estadoSelecionado,
-                        'perfil' : widget.dadosUser!['perfil'] != null? widget.dadosUser!['perfil']:''
+                        'perfil' : BadStateTexto(widget.dadosUser!,'perfil')
                       };
                       salvarDados();
                     }else{
@@ -212,7 +212,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
           dadosSocio['foto'] = linkfoto;
           FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
             if(BadStateLista(widget.dadosUser!,'alunos').isEmpty){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],adicionarAluno: false,)));
             }else{
               Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
             }
@@ -222,7 +222,7 @@ class _TelaCadastrarSocioState extends State<TelaCadastrarSocio> {
     }else{
       FirebaseFirestore.instance.collection('usuarios').doc(widget.dadosUser!['idUsuario']).set(dadosSocio,SetOptions(merge: true)).then((_){
         if(BadStateLista(widget.dadosUser!,'alunos').isEmpty){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],)));
+          Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaCadastrarAluno(dadosSocio: dadosSocio,alunosAdicionados: [],adicionarAluno: false,)));
         }else{
           Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
         }

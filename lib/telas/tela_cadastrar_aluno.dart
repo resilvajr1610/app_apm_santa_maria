@@ -11,6 +11,7 @@ import 'package:app_apm_santa_maria/modelos/serie_modelo.dart';
 import 'package:app_apm_santa_maria/telas/tela_confirmar_cadastro.dart';
 import 'package:app_apm_santa_maria/telas/tela_perfil.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,10 +23,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TelaCadastrarAluno extends StatefulWidget {
   Map <String, dynamic>? dadosSocio;
   var alunosAdicionados;
+  bool adicionarAluno;
 
   TelaCadastrarAluno({
     required this.dadosSocio,
     required this.alunosAdicionados,
+    required this.adicionarAluno
   });
 
   @override
@@ -39,7 +42,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
 
   TextEditingController nomeAluno = TextEditingController();
   TextEditingController nomeGuerra = TextEditingController();
-  TextEditingController matricula = TextEditingController();
+  TextEditingController numeroAluno = TextEditingController();
   TextEditingController nascimento = TextEditingController();
   List <SerieModelo> series = [];
   XFile? foto;
@@ -51,7 +54,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     List nomeCompleto = nomeAluno.text.split(' ');
     if(nomeCompleto.length>1){
       if(nomeGuerra.text.isNotEmpty){
-        if(matricula.text.length>3){
+        if(numeroAluno.text.length>3){
           if(nascimento.text.length==10){
             if(anoSelecionado!=null){
               if(sexoSelecionado!=null){
@@ -60,13 +63,14 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                   dadosAlunoAtual={
                     'nome': nomeAluno.text,
                     'nomeGuerra' : nomeGuerra.text,
-                    'matricula': matricula.text,
+                    'matricula': numeroAluno.text,
                     'nascimento'  : nascimento.text,
                     'serie' : anoSelecionado!.nome,
                     'idSerie' : anoSelecionado!.id,
                     'sexo': sexoSelecionado,
                     'foto' : foto,
-                    'indice' : alunosAdicionados.length
+                    'indice' : alunosAdicionados.length,
+                    'anos' : [2024]
                   };
                   alunosAdicionados.add(dadosAlunoAtual);
 
@@ -83,8 +87,13 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
                   print(widget.dadosSocio);
                   print('alunosAdicionados');
                   print(alunosAdicionados);
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>
-                      TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
+
+                  if(widget.adicionarAluno){
+                    salvarAluno();
+                  }else{
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>
+                        TelaConfirmarCadastro(dadosSocio: widget.dadosSocio!,alunosAdicionados: alunosAdicionados,)));
+                  }
                 }else{
                   showSnackBar(context, 'Adicione uma foto do aluno', Colors.red);
                 }
@@ -112,7 +121,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     List nomeCompleto = nomeAluno.text.split(' ');
     if(nomeCompleto.length>1){
       if(nomeGuerra.text.isNotEmpty){
-        if(matricula.text.length>3){
+        if(numeroAluno.text.length>3){
           if(nascimento.text.length==10){
             if(anoSelecionado!=null){
               if(sexoSelecionado!=null){
@@ -148,11 +157,12 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
     dadosAlunoAtual={
       'nome': nomeAluno.text.toUpperCase(),
       'nomeGuerra' : nomeGuerra.text.toUpperCase(),
-      'matricula': matricula.text.toUpperCase(),
+      'matricula': numeroAluno.text.toUpperCase(),
       'nascimento'  : nascimento.text.toUpperCase(),
       'serie' : anoSelecionado!.nome,
       'idSerie' : anoSelecionado!.id,
       'sexo': sexoSelecionado,
+      'anos' : [2024]
     };
     if(foto!=null){
       Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${DateTime.now().toIso8601String()+ ".jpg"}');
@@ -213,12 +223,46 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
   dadosAluno(){
     nomeAluno.text = widget.alunosAdicionados[0]['nome'];
     nomeGuerra.text = widget.alunosAdicionados[0]['nomeGuerra'];
-    matricula.text = widget.alunosAdicionados[0]['matricula'];
+    numeroAluno.text = widget.alunosAdicionados[0]['matricula'];
     nascimento.text = widget.alunosAdicionados[0]['nascimento'];
     anoSelecionado = series.firstWhere((serie) => serie.id == widget.alunosAdicionados[0]['idSerie']);
     sexoSelecionado = widget.alunosAdicionados[0]['sexo'];
     fotoLink = widget.alunosAdicionados[0]['foto'];
     setState(() {});
+  }
+
+  salvarAluno()async{
+    Reference storageReference = FirebaseStorage.instance.ref().child('alunos/${DateTime.now().toIso8601String()+ ".jpg"}');
+    Uint8List archive = await foto!.readAsBytes();
+    UploadTask uploadTask = storageReference.putData(archive);
+
+    uploadTask.then((caminho) {
+      caminho.ref.getDownloadURL().then((link) {
+        String linkfoto = link.toString();
+        final docRefAlunos = FirebaseFirestore.instance.collection('alunos').doc();
+        FirebaseFirestore.instance.collection('alunos').doc(docRefAlunos.id).set({
+          'idAluno'             : docRefAlunos.id,
+          'nome'                : nomeAluno.text.toUpperCase(),
+          'nomeGuerra'          : nomeGuerra.text.toUpperCase(),
+          'matricula'           : numeroAluno.text.toUpperCase(),
+          'nascimento'          : nascimento.text.toUpperCase(),
+          'serie'               : anoSelecionado!.nome,
+          'idSerie'             : anoSelecionado!.id,
+          'sexo'                : sexoSelecionado,
+          'foto'                : linkfoto,
+          'responsavelCriacao'  : FirebaseAuth.instance.currentUser!.email,
+          'criado'              : DateTime.now(),
+          'anos'                : FieldValue.arrayUnion([DateTime.now().year])
+        },SetOptions(merge: true)).then((_){
+          FirebaseFirestore.instance.collection('usuarios')
+              .doc(FirebaseAuth.instance.currentUser!.uid).update({
+            'alunos':FieldValue.arrayUnion([docRefAlunos.id]),
+          }).then((_){
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaPerfil()));
+          });
+        });
+      });
+    });
   }
 
   @override
@@ -249,7 +293,7 @@ class _TelaCadastrarAlunoState extends State<TelaCadastrarAluno> {
               children: [
                 Container(
                   width: largura*0.38,
-                  child: InputPadrao(tituloTopo: 'Matrícula', controller: matricula,paddingHorizontal: 0,paddingVertical: 5,)
+                  child: InputPadrao(tituloTopo: 'Número do aluno', controller: numeroAluno,paddingHorizontal: 0,paddingVertical: 5,)
                 ),
                 Container(
                   width: largura*0.38,
