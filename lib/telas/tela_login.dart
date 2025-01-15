@@ -3,6 +3,7 @@ import 'package:app_apm_santa_maria/modelos/bad_state_texto.dart';
 import 'package:app_apm_santa_maria/telas/tela_cadastrar_socio.dart';
 import 'package:app_apm_santa_maria/componentes/botao_sublinhado.dart';
 import 'package:app_apm_santa_maria/telas/tela_emprestimos.dart';
+import 'package:app_apm_santa_maria/telas/tela_redefinir_senha.dart';
 import 'package:app_apm_santa_maria/uteis/cores.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -72,7 +73,10 @@ class _TelaLoginState extends State<TelaLogin> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  BotaoSublinhado(texto: 'Esqueci a senha/resetar', funcao: (){}),
+                  BotaoSublinhado(
+                      texto: 'Esqueci a senha/resetar',
+                      funcao: ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>TelaRedefinirSenha())),
+                  ),
                 ],
               ),
             ),
